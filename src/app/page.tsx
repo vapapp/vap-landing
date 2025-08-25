@@ -17,7 +17,7 @@ export default function HomePage() {
         />
       </div>
 
-      {/* Conteúdo Central */}
+     
       <div className={styles.content}>
         
         <TerminalLoader />
