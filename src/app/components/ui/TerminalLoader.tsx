@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './TerminalLoader.module.css';
 
-// Removemos a prop 'text' pois o componente agora controla seu próprio texto
+
 interface TerminalLoaderProps {
   className?: string;
 }

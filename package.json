@@ -7,7 +7,7 @@
     "build": "next build --turbopack",
     "start": "next start -p 3001",
     "lint": "eslint"
-  },
+  }, 
   "dependencies": {
     "next": "15.5.0",
     "react": "19.1.0",
