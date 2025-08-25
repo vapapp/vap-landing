@@ -19,7 +19,7 @@ export default function HomePage() {
 
       {/* Conteúdo Central */}
       <div className={styles.content}>
-        {/* O texto agora será controlado internamente pelo componente */}
+        
         <TerminalLoader />
       </div>
     </main>
