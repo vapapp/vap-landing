@@ -1,33 +1,35 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #ffffff;    
+  --foreground: #111827;   
+  --primary: #00949D;       
+  --light-gray: #f0f4f8;    
+  --medium-gray: #d1d5db;  
+  --dark-gray: #4b5563;    
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+
+html {
+  color-scheme: light;
 }
 
 html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  padding: 0;
+  margin: 0;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 * {
   box-sizing: border-box;
-  padding: 0;
-  margin: 0;
 }
 
 a {
@@ -35,13 +37,7 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-}
 
-/* Animações Globais */
 @keyframes blinkCursor {
   50% {
     border-right-color: transparent;
@@ -55,7 +51,7 @@ a {
   }
   45%,
   55% {
-    width: 13.5em; /* Ajuste a largura para o tamanho do seu texto */
+    width: 13.5em; 
   }
   90%,
   100% {
