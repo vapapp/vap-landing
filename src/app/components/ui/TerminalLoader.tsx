@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './TerminalLoader.module.css';
 
-
+// testando servidor
 interface TerminalLoaderProps {
   className?: string;
 }
