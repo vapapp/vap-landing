@@ -1,4 +1,4 @@
-"use client"; // Essencial para componentes que usam hooks de interação (useState, useEffect, etc)
+"use client"; 
 
 import React, { useRef, useEffect } from "react";
 import "./Squares.css";

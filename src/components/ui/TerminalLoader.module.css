@@ -62,9 +62,7 @@
   white-space: nowrap;
   overflow: hidden;
   margin-top: 1.5rem;
-  min-height: 1.2em; /* Garante que a altura não colapse quando o texto estiver vazio */
+  min-height: 1.2em; 
   border-right: 2px solid #4ade80;
-  
-  /* A animação de digitação foi removida, mantendo apenas o cursor piscando */
   animation: blinkCursor 0.75s step-end infinite alternate;
 }
