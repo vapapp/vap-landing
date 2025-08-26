@@ -1,0 +1,102 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f0f4f8;
+  padding: 20px;
+  font-family: var(--font-geist-sans);
+}
+
+.card {
+  width: 100%;
+  max-width: 550px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  padding: 40px;
+  text-align: center;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.icon {
+  margin: 0 auto 20px;
+  width: 60px;
+  height: 60px;
+  background-color: #e6f4f5;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #00949D;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 15px;
+}
+
+.description {
+  font-size: 1.1rem;
+  color: #4a5568;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.timeEstimate {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  color: #718096;
+  margin-bottom: 25px;
+  font-size: 0.95rem;
+}
+
+.startButton {
+  display: inline-block;
+  width: 100%;
+  padding: 15px 30px;
+  background-color: #00949D; 
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+}
+
+.startButton:hover {
+  background-color: #007a83; 
+}
+
+.startButton:active {
+  transform: scale(0.98);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 30px 25px;
+  }
+  .title {
+    font-size: 1.5rem;
+  }
+  .description {
+    font-size: 1rem;
+  }
+}
