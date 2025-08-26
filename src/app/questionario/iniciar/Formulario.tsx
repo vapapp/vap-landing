@@ -1,105 +1,54 @@
 "use client";
 
-import { useState, useMemo } from 'react';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { useQuestionarioForm } from '@/hooks/useQuestionarioForm';
 import styles from './Questionario.module.css';
+import {
+  nivelEstudoOptions,
+  parentescoOptions,
+  maiorMedoOptions,
+  sentimentoApoioOptions,
+  confiancaCuidadoOptions,
+  buscaInformacaoOptions,
+  momentoUsoAppOptions,
+  importanciaAppOptions,
+  maiorBeneficioOptions,
+  filhoIntubadoOptions,
+  sabiaRiscosIntubacaoOptions,
+  explicaramRiscosTQTOptions,
+  medoIntubacaoOptions,
+  importanciaVozFamiliasOptions,
+  pensouComprarDispositivoOptions,
+  dificuldadeCompraOptions,
+  utilidadeOutrasCondicoesOptions,
+  funcionalidadesOptions,
+  avaliacaoOptions,
+  type FormData,
+} from './constants';
 
 
-interface FormData {
-  [key: string]: string | undefined; 
-  nome?: string;
-  contato?: string;
-  nivelEstudo?: string;
-  usaTraqueostomia?: 'Sim' | 'Não' | '';
-  parentesco?: string;
-  maiorMedo?: string;
-  sentimentoApoio?: string;
-  confiancaCuidado?: string;
-  buscaInformacao?: string;
-  momentoUsoApp?: string;
-  importanciaApp?: string;
-  maiorBeneficio?: string;
-  cuidaOutraCondicao?: 'Sim' | 'Não';
-  utilidadeOutrasCondicoes?: string;
-  filhoIntubado?: string;
-  sabiaRiscosIntubacao?: string;
-  explicaramRiscosTQT?: string;
-  medoIntubacao?: string;
-  importanciaVozFamilias?: string;
-  pensouComprarDispositivo?: string;
-  dificuldadeCompra?: string;
-}
+const RadioOption = ({ name, value, checked, onChange }: { name: keyof FormData; value: string; checked: boolean; onChange: (name: keyof FormData, value: string) => void; }) => (
+  <label className={`${styles.radioLabel} ${checked ? styles.checked : ''}`}>
+    <input type="radio" name={name as string} value={value} checked={checked} onChange={() => onChange(name, value)} />
+    {value}
+  </label>
+);
 
 export default function Formulario() {
-  const [step, setStep] = useState(0); 
-  const [formData, setFormData] = useState<FormData>({ usaTraqueostomia: '' });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const {
+    step,
+    formData,
+    isLoading,
+    error,
+    isSubmitted,
+    stepsConfig,
+    totalSteps,
+    handleInputChange,
+    handleRadioChange,
+    nextStep,
+    prevStep,
+    handleSubmit,
+  } = useQuestionarioForm();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleRadioChange = (name: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  
-  const stepsConfig = useMemo(() => {
-    if (formData.usaTraqueostomia === 'Não') {
-      return [
-        { name: 'Perfil' },
-        { name: 'Cuidados Gerais' },
-        { name: 'Finalização' },
-      ];
-    }
-    
-    return [
-      { name: 'Perfil' },
-      { name: 'Desafios' },
-      { name: 'Solução VAP-App' },
-      { name: 'Experiência' },
-      { name: 'Finalização' },
-    ];
-  }, [formData.usaTraqueostomia]);
-  
-  const totalSteps = stepsConfig.length;
-
-  const nextStep = () => {
-    setError(null); 
-    setStep(prev => Math.min(prev + 1, totalSteps - 1));
-  }
-  const prevStep = () => {
-    setError(null); 
-    setStep(prev => Math.max(prev - 1, 0));
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-   
-    if (formData.usaTraqueostomia === 'Não' && !formData.cuidaOutraCondicao) {
-        setError("Por favor, responda a todas as perguntas antes de finalizar.");
-        return;
-    }
-    
-    setIsLoading(true);
-    
-    try {
-      const dataToSave = { ...formData, createdAt: serverTimestamp() };
-      await addDoc(collection(db, "respostasQuestionario"), dataToSave);
-      setIsSubmitted(true);
-    } catch (err) {
-      console.error("Erro ao salvar no Firebase:", err);
-      setError("Ocorreu um erro ao enviar suas respostas. Tente novamente.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (isSubmitted) {
     return (
@@ -111,61 +60,23 @@ export default function Formulario() {
       </div>
     );
   }
-  
-  const renderStepContent = () => {
-    
-    if (formData.usaTraqueostomia === 'Não') {
-      switch (step) {
-        case 0: 
-          return renderPerfilStep();
-        case 1: 
-          return renderCuidadosGeraisStep();
-        case 2: 
-          return renderFinalizacaoStep();
-        default:
-          return null;
-      }
-    }
 
-    
-    switch (step) {
-      case 0:
-        return renderPerfilStep();
-      case 1:
-        return renderDesafiosStep();
-      case 2:
-        return renderSolucaoStep();
-      case 3:
-        return renderExperienciaStep();
-      case 4:
-        return renderFinalizacaoStep();
-      default:
-        return null;
-    }
-  };
-  
-  const formatTableLabel = (label: string) => {
-    return label
-      .replace(/_/g, ' ')
-      .replace('ia', 'IA')
-      .replace(/\b\w/g, l => l.toUpperCase());
-  };
-
+ 
   const renderPerfilStep = () => (
     <div className={styles.formStep}>
       <h2>Seu Perfil</h2>
       <div className={styles.inputGroup}>
-        <label>1. Nome (opcional)</label>
-        <input type="text" name="nome" value={formData.nome || ''} onChange={handleInputChange} placeholder="Seu nome" />
+        <label>1. Nome</label>
+        <input type="text" name="nome" value={formData.nome || ''} onChange={handleInputChange} placeholder="Seu nome completo" required />
       </div>
       <div className={styles.inputGroup}>
-        <label>2. E-mail ou Telefone (Opcional)</label>
-        <input type="text" name="contato" value={formData.contato || ''} onChange={handleInputChange} placeholder="Seu contato para futuras pesquisas" />
+        <label>2. E-mail ou Telefone</label>
+        <input type="text" name="contato" value={formData.contato || ''} onChange={handleInputChange} placeholder="Seu melhor contato para futuras pesquisas" required />
       </div>
       <div className={styles.inputGroup}>
         <label>3. Qual seu nível de estudo?</label>
         <div className={styles.radioGroup}>
-          {['Não estudei', 'Ensino Fundamental incompleto', 'Ensino Fundamental completo / Médio incompleto', 'Ensino Médio completo', 'Ensino Superior (completo ou incompleto)', 'Pós-Graduação ou mais'].map(o => <RadioOption key={o} name="nivelEstudo" value={o} checked={formData.nivelEstudo === o} onChange={handleRadioChange} />)}
+          {nivelEstudoOptions.map(o => <RadioOption key={o} name="nivelEstudo" value={o} checked={formData.nivelEstudo === o} onChange={handleRadioChange} />)}
         </div>
       </div>
       <div className={styles.inputGroup}>
@@ -184,24 +95,36 @@ export default function Formulario() {
       <div className={styles.inputGroup}>
         <label>5. Qual seu principal parentesco com a criança?</label>
         <div className={styles.radioGroup}>
-          {['Mãe', 'Pai', 'Avó/Avô', 'Outro familiar', 'Cuidador(a) profissional'].map(o => <RadioOption key={o} name="parentesco" value={o} checked={formData.parentesco === o} onChange={handleRadioChange} />)}
+          {parentescoOptions.map(o => <RadioOption key={o} name="parentesco" value={o} checked={formData.parentesco === o} onChange={handleRadioChange} />)}
         </div>
       </div>
       <div className={styles.inputGroup}>
         <label>6. Pensando em momentos de crise, qual é o seu maior medo?</label>
         <div className={styles.radioGroup}>
-          {['Não saber o que fazer a tempo.', 'Não conseguir contatar um médico rapidamente.', 'Tomar a decisão errada por conta própria.', 'O equipamento (aspirador, ventilador) falhar.'].map(o => <RadioOption key={o} name="maiorMedo" value={o} checked={formData.maiorMedo === o} onChange={handleRadioChange} />)}
+          {maiorMedoOptions.map(o => <RadioOption key={o} name="maiorMedo" value={o} checked={formData.maiorMedo === o} onChange={handleRadioChange} />)}
         </div>
       </div>
        <div className={styles.inputGroup}>
         <label>7. Com que frequência você se sente sozinho(a) e sem apoio?</label>
         <div className={styles.radioGroup}>
-          {['Quase todos os dias.', 'Algumas vezes por semana.', 'Algumas vezes por mês.', 'Raramente ou nunca.'].map(o => <RadioOption key={o} name="sentimentoApoio" value={o} checked={formData.sentimentoApoio === o} onChange={handleRadioChange} />)}
+          {sentimentoApoioOptions.map(o => <RadioOption key={o} name="sentimentoApoio" value={o} checked={formData.sentimentoApoio === o} onChange={handleRadioChange} />)}
+        </div>
+      </div>
+      <div className={styles.inputGroup}>
+        <label>8. Como você avalia sua confiança hoje no cuidado da traqueostomia?</label>
+        <div className={styles.radioGroup}>
+          {confiancaCuidadoOptions.map(o => <RadioOption key={o} name="confiancaCuidado" value={o} checked={formData.confiancaCuidado === o} onChange={handleRadioChange} />)}
+        </div>
+      </div>
+      <div className={styles.inputGroup}>
+        <label>9. Quando tem uma dúvida, onde você busca informação primeiro?</label>
+        <div className={styles.radioGroup}>
+          {buscaInformacaoOptions.map(o => <RadioOption key={o} name="buscaInformacao" value={o} checked={formData.buscaInformacao === o} onChange={handleRadioChange} />)}
         </div>
       </div>
     </div>
   );
-  
+
   const renderSolucaoStep = () => (
      <div className={styles.formStep}>
       <h2>Validando a Solução VAP-App</h2>
@@ -209,13 +132,13 @@ export default function Formulario() {
       <div className={styles.inputGroup}>
         <label>10. Avalie a importância de cada funcionalidade:</label>
         <div className={styles.table}>
-          {['guia_emergencia', 'videos_curtos', 'ia_sintomas', 'diario_eventos', 'comunidade_segura'].map(func => (
-            <div key={func} className={styles.tableRow}>
-              <span className={styles.tableLabel}>{formatTableLabel(func)}</span>
+          {funcionalidadesOptions.map(func => (
+            <div key={func.id} className={styles.tableRow}>
+              <span className={styles.tableLabel}>{func.label}</span>
               <div className={styles.tableRadios}>
-                {['Inútil', 'Pouco Útil', 'Útil', 'Muito Útil', 'Essencial'].map(level => (
+                {avaliacaoOptions.map(level => (
                   <label key={level} title={level}>
-                    <input type="radio" name={`func_${func}`} value={level} checked={formData[`func_${func}`] === level} onChange={() => handleRadioChange(`func_${func}`, level)} />
+                    <input type="radio" name={`func_${func.id}`} value={level} checked={formData[`func_${func.id}`] === level} onChange={() => handleRadioChange(`func_${func.id}`, level)} />
                   </label>
                 ))}
               </div>
@@ -223,31 +146,93 @@ export default function Formulario() {
           ))}
         </div>
       </div>
+      <div className={styles.inputGroup}>
+        <label>11. Em qual destes momentos você acredita que MAIS usaria o VAP-App?</label>
+        <div className={styles.radioGroup}>
+          {momentoUsoAppOptions.map(o => <RadioOption key={o} name="momentoUsoApp" value={o} checked={formData.momentoUsoApp === o} onChange={handleRadioChange} />)}
+        </div>
+      </div>
+      <div className={styles.inputGroup}>
+        <label>12. O que seria mais importante para você em um aplicativo como este?</label>
+        <div className={styles.radioGroup}>
+          {importanciaAppOptions.map(o => <RadioOption key={o} name="importanciaApp" value={o} checked={formData.importanciaApp === o} onChange={handleRadioChange} />)}
+        </div>
+      </div>
+      <div className={styles.inputGroup}>
+        <label>13. Qual seria o maior benefício que um aplicativo como o VAP-App poderia trazer para a sua vida?</label>
+        <div className={styles.radioGroup}>
+          {maiorBeneficioOptions.map(o => <RadioOption key={o} name="maiorBeneficio" value={o} checked={formData.maiorBeneficio === o} onChange={handleRadioChange} />)}
+        </div>
+      </div>
     </div>
   );
 
-  const renderExperienciaStep = () => (
+  const renderExperienciaSimTQTStep = () => (
+    <div className={styles.formStep}>
+        <h2>Sua Experiência e Acesso</h2>
+        <div className={styles.inputGroup}>
+            <label>1. Você acha importante que a voz das famílias seja ouvida para criar políticas públicas de cuidado?</label>
+            <div className={styles.radioGroup}>
+                {importanciaVozFamiliasOptions.map(o => <RadioOption key={o} name="importanciaVozFamilias" value={o} checked={formData.importanciaVozFamilias === o} onChange={handleRadioChange} />)}
+            </div>
+        </div>
+        <div className={styles.inputGroup}>
+            <label>2. Já pensou em comprar algum dispositivo de via aérea, mas não soube como?</label>
+            <div className={styles.radioGroup}>
+                {pensouComprarDispositivoOptions.map(o => <RadioOption key={o} name="pensouComprarDispositivo" value={o} checked={formData.pensouComprarDispositivo === o} onChange={handleRadioChange} />)}
+            </div>
+        </div>
+        
+        {formData.pensouComprarDispositivo && formData.pensouComprarDispositivo !== 'Não, nunca precisei' && formData.pensouComprarDispositivo !== 'Não sabia que era possível comprar por conta própria' && (
+            <div className={styles.inputGroup}>
+                <label>3. Se já pensou em comprar, qual foi a maior dificuldade?</label>
+                <div className={styles.radioGroup}>
+                    {dificuldadeCompraOptions.map(o => <RadioOption key={o} name="dificuldadeCompra" value={o} checked={formData.dificuldadeCompra === o} onChange={handleRadioChange} />)}
+                </div>
+            </div>
+        )}
+    </div>
+  );
+  
+  const renderExperienciaNaoTQTStep = () => (
     <div className={styles.formStep}>
         <h2>Sua Experiência Hospitalar</h2>
         <div className={styles.inputGroup}>
             <label>1. Seu filho já foi intubado?</label>
             <div className={styles.radioGroup}>
-                {['Sim, mais de uma vez', 'Sim, apenas uma vez', 'Não, nunca precisou', 'Não tenho certeza'].map(o => <RadioOption key={o} name="filhoIntubado" value={o} checked={formData.filhoIntubado === o} onChange={handleRadioChange} />)}
+                {filhoIntubadoOptions.map(o => <RadioOption key={o} name="filhoIntubado" value={o} checked={formData.filhoIntubado === o} onChange={handleRadioChange} />)}
             </div>
         </div>
-        <div className={styles.inputGroup}>
-            <label>6. Já pensou em comprar algum dispositivo de via aérea mas não soube como?</label>
-            <div className={styles.radioGroup}>
-                {['Sim, várias vezes', 'Sim, apenas uma vez', 'Não, nunca precisei', 'Não sabia que era possível comprar por conta própria'].map(o => <RadioOption key={o} name="pensouComprarDispositivo" value={o} checked={formData.pensouComprarDispositivo === o} onChange={handleRadioChange} />)}
-            </div>
-        </div>
+       
+        {formData.filhoIntubado && !formData.filhoIntubado.startsWith('Não') && (
+            <>
+                <div className={styles.inputGroup}>
+                    <label>2. Antes da intubação, você sabia que existiam riscos para a criança?</label>
+                    <div className={styles.radioGroup}>
+                        {sabiaRiscosIntubacaoOptions.map(o => <RadioOption key={o} name="sabiaRiscosIntubacao" value={o} checked={formData.sabiaRiscosIntubacao === o} onChange={handleRadioChange} />)}
+                    </div>
+                </div>
+                <div className={styles.inputGroup}>
+                    <label>3. Durante a internação, alguém explicou para você os riscos da traqueostomia?</label>
+                    <div className={styles.radioGroup}>
+                        {explicaramRiscosTQTOptions.map(o => <RadioOption key={o} name="explicaramRiscosTQT" value={o} checked={formData.explicaramRiscosTQT === o} onChange={handleRadioChange} />)}
+                    </div>
+                </div>
+                <div className={styles.inputGroup}>
+                    <label>4. Qual foi o seu principal medo ao ver seu filho intubado?</label>
+                    <div className={styles.radioGroup}>
+                        {medoIntubacaoOptions.map(o => <RadioOption key={o} name="medoIntubacao" value={o} checked={formData.medoIntubacao === o} onChange={handleRadioChange} />)}
+                    </div>
+                </div>
+            </>
+        )}
     </div>
   );
-  
+
   const renderCuidadosGeraisStep = () => (
     <div className={styles.formStep}>
         <h2>Cuidados Respiratórios</h2>
-        <p className={styles.sectionDescription}>Embora o foco principal do nosso app seja para crianças com traqueostomia, sua opinião ainda é importante.</p>
+        <p className={styles.sectionDescription}>Sua opinião ainda é muito importante para entendermos outros cenários de cuidado.</p>
         <div className={styles.inputGroup}>
             <label>5. Você cuida de alguma criança que precise de cuidados respiratórios complexos (oxigênio, aspirador), mesmo sem traqueostomia?</label>
             <div className={styles.radioGroup}>
@@ -258,7 +243,7 @@ export default function Formulario() {
         <div className={styles.inputGroup}>
             <label>6. Você acredita que um app com guias de saúde e organização seria útil para cuidadores de crianças com outras condições complexas?</label>
             <div className={styles.radioGroup}>
-                {['Sim, com certeza seria muito útil.', 'Talvez, dependendo da condição.', 'Não, acho que não seria necessário.'].map(o => <RadioOption key={o} name="utilidadeOutrasCondicoes" value={o} checked={formData.utilidadeOutrasCondicoes === o} onChange={handleRadioChange} />)}
+                {utilidadeOutrasCondicoesOptions.map(o => <RadioOption key={o} name="utilidadeOutrasCondicoes" value={o} checked={formData.utilidadeOutrasCondicoes === o} onChange={handleRadioChange} />)}
             </div>
         </div>
     </div>
@@ -271,12 +256,27 @@ export default function Formulario() {
     </div>
   );
 
-  const RadioOption = ({ name, value, checked, onChange }: { name: keyof FormData, value: string, checked: boolean, onChange: (name: keyof FormData, value: string) => void }) => (
-    <label className={`${styles.radioLabel} ${checked ? styles.checked : ''}`}>
-      <input type="radio" name={name as string} value={value} checked={checked} onChange={() => onChange(name, value)} />
-      {value}
-    </label>
-  );
+
+  const renderStepContent = () => {
+    if (formData.usaTraqueostomia === 'Não') {
+      switch (step) {
+        case 0: return renderPerfilStep();
+        case 1: return renderCuidadosGeraisStep();
+        case 2: return renderExperienciaNaoTQTStep();
+        case 3: return renderFinalizacaoStep();
+        default: return null;
+      }
+    }
+
+    switch (step) {
+      case 0: return renderPerfilStep();
+      case 1: return renderDesafiosStep();
+      case 2: return renderSolucaoStep();
+      case 3: return renderExperienciaSimTQTStep();
+      case 4: return renderFinalizacaoStep();
+      default: return null;
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className={styles.formContainer}>
@@ -289,7 +289,7 @@ export default function Formulario() {
           </div>
         ))}
       </div>
-      
+
       <div className={styles.formContent}>
         {renderStepContent()}
       </div>
