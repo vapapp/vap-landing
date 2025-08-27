@@ -8,7 +8,7 @@
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
@@ -20,6 +20,20 @@
   font-size: 1.25rem;
   font-weight: 600;
   color: #00949d;
+}
+
+.menuButton {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  color: #333;
+}
+
+.menuButton:hover {
+  background-color: #f0f4f8;
 }
 
 .logoutButton {
@@ -35,4 +49,18 @@
 
 .logoutButton:hover {
   background-color: #d9dcdf;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 0 1rem;
+  }
+  .menuButton {
+    display: block;
+  }
+  .logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }
