@@ -2,8 +2,19 @@
 
 import styles from "./Charts.module.css";
 
+interface FuncionalidadeDataItem {
+  name: string;
+  Essencial?: number;
+  "Muito Útil"?: number;
+  Útil?: number;
+  "Pouco Útil"?: number;
+  Inútil?: number;
+
+  [key: string]: string | number | undefined;
+}
+
 interface FuncionalidadesChartProps {
-  data: any[];
+  data: FuncionalidadeDataItem[];
 }
 
 const COLORS: { [key: string]: string } = {
@@ -38,7 +49,7 @@ const FuncionalidadesChart = ({ data }: FuncionalidadesChartProps) => {
           </div>
           <div className={styles.stackedBar}>
             {RATING_ORDER.map((key) => {
-              const value = item[key] || 0;
+              const value = (item[key] as number) || 0;
               if (value === 0) return null;
               return (
                 <div
@@ -52,7 +63,7 @@ const FuncionalidadesChart = ({ data }: FuncionalidadesChartProps) => {
           </div>
           <div className={styles.legend}>
             {RATING_ORDER.map((key) => {
-              const value = item[key] || 0;
+              const value = (item[key] as number) || 0;
               if (value === 0) return null;
               return (
                 <div key={key} className={styles.legendItem}>
