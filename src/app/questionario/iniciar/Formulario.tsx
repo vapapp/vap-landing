@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from 'react'; 
+import { useEffect, useRef } from 'react';
+import Link from 'next/link'; 
 import { useQuestionarioForm } from '@/hooks/useQuestionarioForm';
+import Toast from '@/components/ui/Toast';
 import styles from './Questionario.module.css';
 import {
   nivelEstudoOptions,
@@ -45,13 +47,15 @@ export default function Formulario() {
     totalSteps,
     handleInputChange,
     handleRadioChange,
+    handleCheckboxChange,
     nextStep,
     prevStep,
     handleSubmit,
+    clearError,
   } = useQuestionarioForm();
 
   const stepperRef = useRef<HTMLDivElement>(null);
-  const stepperPlaceholderRef = useRef<HTMLDivElement>(null); 
+  const stepperPlaceholderRef = useRef<HTMLDivElement>(null);
   const prevStepRef = useRef(step);
 
 
@@ -66,10 +70,10 @@ export default function Formulario() {
       ([entry]) => {
         if (!entry.isIntersecting) {
           stepper.classList.add(styles.sticky);
-          placeholder.style.height = `${stepperHeight}px`; 
+          placeholder.style.height = `${stepperHeight}px`;
         } else {
           stepper.classList.remove(styles.sticky);
-          placeholder.style.height = '0px'; 
+          placeholder.style.height = '0px';
         }
       },
       { rootMargin: '-1px 0px 0px 0px', threshold: 1.0 }
@@ -96,11 +100,15 @@ export default function Formulario() {
 
   if (isSubmitted) {
     return (
-      <div className={styles.formContainer}>
-        <div className={styles.thankYouMessage}>
-          <h2>Obrigado por sua colaboração!</h2>
-          <p>Suas respostas nos ajudarão a construir uma ferramenta que realmente faça a diferença.</p>
+      <div className={styles.thankYouContainer}>
+        <div className={styles.thankYouIcon}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
         </div>
+        <h2 className={styles.thankYouTitle}>Muito obrigado!</h2>
+        <p className={styles.thankYouText}>Sua colaboração é fundamental para construirmos uma ferramenta que realmente faça a diferença na vida de muitas famílias. Agradecemos imensamente pelo seu tempo e dedicação.</p>
       </div>
     );
   }
@@ -129,6 +137,33 @@ export default function Formulario() {
           <RadioOption name="usaTraqueostomia" value="Sim" checked={formData.usaTraqueostomia === 'Sim'} onChange={handleRadioChange} />
           <RadioOption name="usaTraqueostomia" value="Não" checked={formData.usaTraqueostomia === 'Não'} onChange={handleRadioChange} />
         </div>
+      </div>
+      
+      <div className={styles.consentGroup}>
+        <label className={styles.consentLabel}>
+          <input 
+            type="checkbox" 
+            name="aceitouTermosPesquisa"
+            checked={!!formData.aceitouTermosPesquisa}
+            onChange={handleCheckboxChange}
+            className={styles.checkbox}
+          />
+          <span>
+            Li e concordo com os <Link href="/termos-de-pesquisa" target="_blank" className={styles.consentLink}>termos da pesquisa</Link>. (Obrigatório)
+          </span>
+        </label>
+      </div>
+      <div className={styles.consentGroup}>
+        <label className={styles.consentLabel}>
+          <input 
+            type="checkbox" 
+            name="aceitouContatoFuturo"
+            checked={!!formData.aceitouContatoFuturo}
+            onChange={handleCheckboxChange}
+            className={styles.checkbox}
+          />
+          <span>Aceito receber e-mails com novidades sobre o VAP-App e futuras pesquisas. (Opcional)</span>
+        </label>
       </div>
     </div>
   );
@@ -337,6 +372,8 @@ export default function Formulario() {
 
   return (
     <form onSubmit={handleSubmit} className={styles.formContainer}>
+      {error && <Toast message={error} onClose={clearError} />}
+
       <div ref={stepperPlaceholderRef} />
       <div ref={stepperRef} className={styles.stepperContainer}>
         <div className={styles.stepperLine} style={{ width: `${(step / (totalSteps - 1)) * 100}%` }}></div>
@@ -353,11 +390,18 @@ export default function Formulario() {
       </div>
 
       <div className={styles.navigationButtons}>
-        <button type="button" onClick={prevStep} className={styles.prevButton} disabled={step === 0}>
-          Anterior
-        </button>
+        {step > 0 && (
+          <button type="button" onClick={prevStep} className={styles.prevButton}>
+            Anterior
+          </button>
+        )}
         {step < totalSteps - 1 ? (
-          <button type="button" onClick={nextStep} className={styles.nextButton} disabled={step === 0 && !formData.usaTraqueostomia}>
+          <button 
+            type="button" 
+            onClick={nextStep} 
+            className={styles.nextButton} 
+            disabled={(step === 0 && !formData.usaTraqueostomia) || (step === 0 && !formData.aceitouTermosPesquisa)}
+          >
             Próximo
           </button>
         ) : (
@@ -366,7 +410,6 @@ export default function Formulario() {
           </button>
         )}
       </div>
-      {error && <p className={styles.errorMessage}>{error}</p>}
     </form>
   );
 }
