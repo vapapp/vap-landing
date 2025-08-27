@@ -51,10 +51,10 @@ export default function Formulario() {
   } = useQuestionarioForm();
 
   const stepperRef = useRef<HTMLDivElement>(null);
-  const stepperPlaceholderRef = useRef<HTMLDivElement>(null);
-  const prevStepRef = useRef(step); 
+  const stepperPlaceholderRef = useRef<HTMLDivElement>(null); 
+  const prevStepRef = useRef(step);
 
-  
+
   useEffect(() => {
     const stepper = stepperRef.current;
     const placeholder = stepperPlaceholderRef.current;
@@ -66,10 +66,10 @@ export default function Formulario() {
       ([entry]) => {
         if (!entry.isIntersecting) {
           stepper.classList.add(styles.sticky);
-          placeholder.style.height = `${stepperHeight}px`;
+          placeholder.style.height = `${stepperHeight}px`; 
         } else {
           stepper.classList.remove(styles.sticky);
-          placeholder.style.height = '0px';
+          placeholder.style.height = '0px'; 
         }
       },
       { rootMargin: '-1px 0px 0px 0px', threshold: 1.0 }
@@ -84,20 +84,16 @@ export default function Formulario() {
 
   
   useEffect(() => {
-   
     if (step > prevStepRef.current) {
-      
       window.scrollTo({
         top: 0,
         behavior: 'smooth'
       });
     }
-   
     prevStepRef.current = step;
   }, [step]);
 
 
- 
   if (isSubmitted) {
     return (
       <div className={styles.formContainer}>
@@ -108,7 +104,6 @@ export default function Formulario() {
       </div>
     );
   }
-
 
   const renderPerfilStep = () => (
     <div className={styles.formStep}>
@@ -198,6 +193,7 @@ export default function Formulario() {
                 {avaliacaoOptions.map(level => (
                   <label key={level} title={level}>
                     <input type="radio" name={`func_${func.id}`} value={level} checked={formData[`func_${func.id}`] === level} onChange={() => handleRadioChange(`func_${func.id}`, level)} />
+                    <span>{level}</span>
                   </label>
                 ))}
               </div>

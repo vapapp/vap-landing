@@ -215,6 +215,7 @@
   font-size: 0.8rem;
   font-weight: 600;
   color: #555;
+  align-items: end;
 }
 
 .tableHeaderOptions {
@@ -328,21 +329,21 @@
     background-color: #ffffff; 
   }
   .formContainer {
-    padding: 20px;
+    padding: 20px 15px;
     box-shadow: none; 
     border-radius: 0; 
     min-height: 100vh; 
   }
-
+  
   .sticky {
     max-width: 100%;
     border-radius: 0;
-    padding: 15px 20px;
+    padding: 15px 15px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   }
   .sticky::before, .sticky .stepperLine {
-    left: 20px;
-    right: 20px;
+    left: 15px;
+    right: 15px;
   }
   .formStep h2 {
     font-size: 1.25rem;
@@ -350,13 +351,35 @@
   .stepLabel {
     font-size: 0.7rem;
   }
+
+  .table {
+    border: none;
+    padding: 0;
+  }
   .tableHeader {
     display: none; 
   }
   .tableRow {
-    grid-template-columns: 1fr;
-    gap: 15px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 15px;
+    grid-template-columns: 1fr; 
+    gap: 10px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+  .tableRadios {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 5px;
+    text-align: center;
+  }
+  .tableRadios label {
+    flex-direction: column-reverse; 
+    font-size: 0.7rem;
+    color: #555;
+    gap: 5px;
+  }
+  .tableDescription {
+    font-size: 0.8rem;
   }
 }
