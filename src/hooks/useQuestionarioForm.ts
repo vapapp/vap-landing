@@ -15,28 +15,27 @@ export const useQuestionarioForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  
   const stepsConfig = useMemo(() => {
     if (formData.usaTraqueostomia === 'Não') {
       return [
-        { name: 'Perfil' },
-        { name: 'Cuidados Gerais' },
-        { name: 'Experiência' },
+        { name: 'Seção 1' },
+        { name: 'Seção 2' },
+        { name: 'Seção 3' },
         { name: 'Finalização' },
       ];
     }
     return [
-      { name: 'Perfil' },
-      { name: 'Desafios' },
-      { name: 'Solução VAP-App' },
-      { name: 'Experiência' },
+      { name: 'Seção 1' },
+      { name: 'Seção 2' },
+      { name: 'Seção 3' },
+      { name: 'Seção 4' },
       { name: 'Finalização' },
     ];
   }, [formData.usaTraqueostomia]);
 
   const totalSteps = stepsConfig.length;
 
-  
+
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -45,7 +44,6 @@ export const useQuestionarioForm = () => {
   const handleRadioChange = useCallback((name: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   }, []);
-
 
   const validateStep = useCallback((currentStep: number): boolean => {
     const stepFields: { [key: string]: (keyof FormData)[][] } = {
@@ -76,10 +74,10 @@ export const useQuestionarioForm = () => {
         if (field === 'dificuldadeCompra' && (formData.pensouComprarDispositivo === 'Não, nunca precisei' || formData.pensouComprarDispositivo === 'Não sabia que era possível comprar por conta própria')) {
             continue;
         }
-        
+       
         if (formData.usaTraqueostomia === 'Não' && currentStep === 2) {
             if (formData.filhoIntubado?.startsWith('Não')) {
-                
+               
                 if (field !== 'filhoIntubado' && !formData[field]) {
                     continue;
                 }
@@ -109,7 +107,6 @@ export const useQuestionarioForm = () => {
     setStep(prev => Math.max(prev - 1, 0));
   }, []);
 
-  
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
