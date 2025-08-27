@@ -11,26 +11,40 @@ const navItems = [
   { href: "/admin/dashboard/comportamento", label: "Comportamento" },
 ];
 
-const Sidebar = () => {
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const pathname = usePathname();
 
   return (
-    <aside className={styles.sidebar}>
-      <nav className={styles.nav}>
-        <ul>
-          {navItems.map((item) => (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                className={pathname === item.href ? styles.active : ""}
-              >
-                {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </aside>
+    <>
+      <div
+        className={`${styles.backdrop} ${isOpen ? styles.backdropVisible : ""}`}
+        onClick={onClose}
+      />
+      <aside
+        className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ""}`}
+      >
+        <nav className={styles.nav}>
+          <ul>
+            {navItems.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={pathname === item.href ? styles.active : ""}
+                  onClick={onClose}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
+    </>
   );
 };
 
