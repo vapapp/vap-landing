@@ -10,10 +10,18 @@ import { funcionalidadesOptions } from '@/app/questionario/iniciar/constants';
  */
 export const useQuestionarioForm = () => {
   const [step, setStep] = useState(0);
-  const [formData, setFormData] = useState<FormData>({ usaTraqueostomia: '' });
+  const [formData, setFormData] = useState<FormData>({ 
+    usaTraqueostomia: '',
+    aceitouTermosPesquisa: false,
+    aceitouContatoFuturo: false
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
 
   const stepsConfig = useMemo(() => {
     if (formData.usaTraqueostomia === 'Não') {
@@ -45,22 +53,32 @@ export const useQuestionarioForm = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   }, []);
 
+  const handleCheckboxChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData(prev => ({ ...prev, [name]: checked }));
+  }, []);
+
   const validateStep = useCallback((currentStep: number): boolean => {
     const stepFields: { [key: string]: (keyof FormData)[][] } = {
       'Sim': [
-        ['nome', 'contato', 'nivelEstudo', 'usaTraqueostomia'],
+        ['nome', 'contato', 'nivelEstudo', 'usaTraqueostomia', 'aceitouTermosPesquisa'],
         ['parentesco', 'maiorMedo', 'sentimentoApoio', 'confiancaCuidado', 'buscaInformacao'],
         [...funcionalidadesOptions.map(f => `func_${f.id}` as keyof FormData), 'momentoUsoApp', 'importanciaApp', 'maiorBeneficio'],
         ['importanciaVozFamilias', 'pensouComprarDispositivo', 'dificuldadeCompra'],
       ],
       'Não': [
-        ['nome', 'contato', 'nivelEstudo', 'usaTraqueostomia'],
+        ['nome', 'contato', 'nivelEstudo', 'usaTraqueostomia', 'aceitouTermosPesquisa'],
         ['cuidaOutraCondicao', 'utilidadeOutrasCondicoes'],
         ['filhoIntubado', 'sabiaRiscosIntubacao', 'explicaramRiscosTQT', 'medoIntubacao'],
       ]
     };
 
     const path = formData.usaTraqueostomia;
+    
+    if (currentStep === 0 && !formData.aceitouTermosPesquisa) {
+      setError("Você precisa aceitar os termos da pesquisa para continuar.");
+      return false;
+    }
     
     if (!path && currentStep > 0) {
       setError("Por favor, selecione se a criança utiliza traqueostomia para continuar.");
@@ -134,8 +152,10 @@ export const useQuestionarioForm = () => {
     totalSteps,
     handleInputChange,
     handleRadioChange,
+    handleCheckboxChange,
     nextStep,
     prevStep,
     handleSubmit,
+    clearError,
   };
 };

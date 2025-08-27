@@ -25,9 +25,8 @@
   justify-content: space-between;
   position: relative;
   margin-bottom: 40px;
-  background-color: #ffffff; 
+  background-color: #ffffff;
 }
-
 
 .sticky {
   position: fixed;
@@ -56,7 +55,6 @@
   z-index: 1;
 }
 
-
 .sticky::before {
   left: 40px;
   right: 40px;
@@ -72,6 +70,7 @@
   z-index: 2;
   transition: width 0.4s ease-in-out;
 }
+
 
 .sticky .stepperLine {
   left: 40px;
@@ -198,6 +197,43 @@
 }
 
 
+.consentGroup {
+  margin-top: 15px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.consentGroup:first-of-type {
+  margin-top: 25px; 
+}
+
+.consentLabel {
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #4a5568;
+}
+
+.consentLink {
+  color: #00949D;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.consentLink:hover {
+  text-decoration: none;
+}
+
+.checkbox {
+  margin-right: 10px;
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  accent-color: #00949D;
+  flex-shrink: 0;
+}
+
 .table {
   display: flex;
   flex-direction: column;
@@ -263,10 +299,16 @@
 .navigationButtons {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-top: 30px;
   border-top: 1px solid #e9ecef;
   padding-top: 20px;
 }
+
+.navigationButtons:has(button.nextButton):not(:has(button.prevButton)) {
+  justify-content: flex-end;
+}
+
 
 .navigationButtons button {
   padding: 12px 28px;
@@ -305,21 +347,40 @@
   background-color: #007a83;
 }
 
-.errorMessage {
-  color: #d93025;
-  margin-top: 15px;
+.thankYouContainer {
   text-align: center;
+  padding: 60px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
 }
 
-.thankYouMessage {
-  text-align: center;
-  padding: 40px 0;
+.thankYouIcon {
+  width: 72px;
+  height: 72px;
+  background-color: #e6f4f5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00949D;
+  margin-bottom: 24px;
 }
 
-.thankYouMessage h2 {
-   font-size: 1.8rem;
-   color: #00949D; 
-   margin-bottom: 15px;
+.thankYouTitle {
+  font-size: 2rem;
+  color: #00949D; 
+  margin-bottom: 16px;
+}
+
+.thankYouText {
+  font-size: 1.1rem;
+  color: #4a5568;
+  line-height: 1.6;
+  max-width: 500px;
+  margin-bottom: 32px;
 }
 
 
@@ -329,12 +390,12 @@
     background-color: #ffffff; 
   }
   .formContainer {
-    padding: 20px 15px;
+    padding: 20px 15px; 
     box-shadow: none; 
     border-radius: 0; 
-    min-height: 100vh; 
+    min-height: 100vh;
   }
-  
+
   .sticky {
     max-width: 100%;
     border-radius: 0;
@@ -351,7 +412,7 @@
   .stepLabel {
     font-size: 0.7rem;
   }
-
+  
   .table {
     border: none;
     padding: 0;

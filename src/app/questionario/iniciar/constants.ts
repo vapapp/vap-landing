@@ -4,11 +4,13 @@
 
 // Define a estrutura dos dados do formulário
 export interface FormData {
-  [key: string]: string | undefined;
+  [key: string]: string | boolean | undefined; 
   nome?: string;
   contato?: string;
   nivelEstudo?: string;
   usaTraqueostomia?: 'Sim' | 'Não' | '';
+  aceitouTermosPesquisa?: boolean; 
+  aceitouContatoFuturo?: boolean; 
   parentesco?: string;
   maiorMedo?: string;
   sentimentoApoio?: string;
