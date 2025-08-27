@@ -1,0 +1,37 @@
+.sidebar {
+  width: 240px;
+  background-color: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  padding: 1.5rem;
+  height: calc(100vh - 64px);
+  position: sticky;
+  top: 64px;
+  flex-shrink: 0;
+}
+
+.nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav li a {
+  display: block;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #4a5568;
+  font-weight: 500;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.nav li a:hover {
+  background-color: #f7fafc;
+  color: #1a202c;
+}
+
+.nav li a.active {
+  background-color: #e6f4f5;
+  color: #00949d;
+  font-weight: 600;
+}
