@@ -153,11 +153,31 @@ export const utilidadeOutrasCondicoesOptions = [
 
 
 export const funcionalidadesOptions = [
-  { id: 'guia_emergencia', label: 'Guia de emergência' },
-  { id: 'videos_curtos', label: 'Vídeos curtos' },
-  { id: 'ia_sintomas', label: 'IA para sintomas' },
-  { id: 'diario_eventos', label: 'Diário de eventos' },
-  { id: 'comunidade_segura', label: 'Comunidade segura' },
+  { 
+    id: 'guia_emergencia', 
+    label: 'Guia de emergência',
+    description: 'Passo a passo para obstrução, sangramento ou saída da cânula.'
+  },
+  { 
+    id: 'videos_curtos', 
+    label: 'Vídeos curtos',
+    description: 'Mostrando como fazer a troca de cânula, aspiração e limpeza.'
+  },
+  { 
+    id: 'ia_sintomas', 
+    label: 'Assistente Inteligente (IA)',
+    description: 'Ajuda a identificar um problema com base nos sintomas descritos.'
+  },
+  { 
+    id: 'diario_eventos', 
+    label: 'Diário de eventos',
+    description: 'Para registrar e criar um histórico fácil de compartilhar com médicos.'
+  },
+  { 
+    id: 'comunidade_segura', 
+    label: 'Comunidade segura',
+    description: 'Para conversar e trocar experiências com outras famílias.'
+  },
 ];
 
 export const avaliacaoOptions = ['Inútil', 'Pouco Útil', 'Útil', 'Muito Útil', 'Essencial'];

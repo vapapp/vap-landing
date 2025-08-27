@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from 'react'; 
 import { useQuestionarioForm } from '@/hooks/useQuestionarioForm';
 import styles from './Questionario.module.css';
 import {
@@ -49,7 +50,54 @@ export default function Formulario() {
     handleSubmit,
   } = useQuestionarioForm();
 
+  const stepperRef = useRef<HTMLDivElement>(null);
+  const stepperPlaceholderRef = useRef<HTMLDivElement>(null);
+  const prevStepRef = useRef(step); 
 
+  
+  useEffect(() => {
+    const stepper = stepperRef.current;
+    const placeholder = stepperPlaceholderRef.current;
+    if (!stepper || !placeholder) return;
+
+    const stepperHeight = stepper.offsetHeight;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          stepper.classList.add(styles.sticky);
+          placeholder.style.height = `${stepperHeight}px`;
+        } else {
+          stepper.classList.remove(styles.sticky);
+          placeholder.style.height = '0px';
+        }
+      },
+      { rootMargin: '-1px 0px 0px 0px', threshold: 1.0 }
+    );
+    
+    observer.observe(placeholder);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  
+  useEffect(() => {
+   
+    if (step > prevStepRef.current) {
+      
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+   
+    prevStepRef.current = step;
+  }, [step]);
+
+
+ 
   if (isSubmitted) {
     return (
       <div className={styles.formContainer}>
@@ -61,10 +109,11 @@ export default function Formulario() {
     );
   }
 
- 
+
   const renderPerfilStep = () => (
     <div className={styles.formStep}>
       <h2>Seu Perfil</h2>
+      <p className={styles.sectionDescription}>Primeiro, algumas perguntas rápidas para entendermos seu perfil. Todas as perguntas são obrigatórias.</p>
       <div className={styles.inputGroup}>
         <label>1. Nome</label>
         <input type="text" name="nome" value={formData.nome || ''} onChange={handleInputChange} placeholder="Seu nome completo" required />
@@ -92,6 +141,7 @@ export default function Formulario() {
   const renderDesafiosStep = () => (
     <div className={styles.formStep}>
       <h2>Sua Realidade e Maiores Desafios</h2>
+      <p className={styles.sectionDescription}>Queremos entender quem são os cuidadores e os desafios que enfrentam no dia a dia.</p>
       <div className={styles.inputGroup}>
         <label>5. Qual seu principal parentesco com a criança?</label>
         <div className={styles.radioGroup}>
@@ -128,13 +178,22 @@ export default function Formulario() {
   const renderSolucaoStep = () => (
      <div className={styles.formStep}>
       <h2>Validando a Solução VAP-App</h2>
-      <p className={styles.sectionDescription}>Imagine um aplicativo no seu celular feito para te ajudar. O quão valiosas seriam as seguintes ferramentas?</p>
+      <p className={styles.sectionDescription}>Agora, imagine um aplicativo no seu celular feito para te ajudar. O quão valiosas seriam as seguintes ferramentas?</p>
       <div className={styles.inputGroup}>
         <label>10. Avalie a importância de cada funcionalidade:</label>
         <div className={styles.table}>
+          <div className={styles.tableHeader}>
+            <div className={styles.tableHeaderFunc}>Funcionalidade</div>
+            <div className={styles.tableHeaderOptions}>
+              {avaliacaoOptions.map(level => <span key={level}>{level}</span>)}
+            </div>
+          </div>
           {funcionalidadesOptions.map(func => (
             <div key={func.id} className={styles.tableRow}>
-              <span className={styles.tableLabel}>{func.label}</span>
+              <div className={styles.tableLabel}>
+                <div>{func.label}</div>
+                <div className={styles.tableDescription}>{func.description}</div>
+              </div>
               <div className={styles.tableRadios}>
                 {avaliacaoOptions.map(level => (
                   <label key={level} title={level}>
@@ -170,6 +229,7 @@ export default function Formulario() {
   const renderExperienciaSimTQTStep = () => (
     <div className={styles.formStep}>
         <h2>Sua Experiência e Acesso</h2>
+        <p className={styles.sectionDescription}>Sua perspectiva sobre o acesso a materiais e a importância da comunidade é fundamental para nós.</p>
         <div className={styles.inputGroup}>
             <label>1. Você acha importante que a voz das famílias seja ouvida para criar políticas públicas de cuidado?</label>
             <div className={styles.radioGroup}>
@@ -197,6 +257,7 @@ export default function Formulario() {
   const renderExperienciaNaoTQTStep = () => (
     <div className={styles.formStep}>
         <h2>Sua Experiência Hospitalar</h2>
+        <p className={styles.sectionDescription}>Para entendermos melhor o contexto, gostaríamos de saber um pouco sobre sua experiência durante períodos de internação.</p>
         <div className={styles.inputGroup}>
             <label>1. Seu filho já foi intubado?</label>
             <div className={styles.radioGroup}>
@@ -232,7 +293,7 @@ export default function Formulario() {
   const renderCuidadosGeraisStep = () => (
     <div className={styles.formStep}>
         <h2>Cuidados Respiratórios</h2>
-        <p className={styles.sectionDescription}>Sua opinião ainda é muito importante para entendermos outros cenários de cuidado.</p>
+        <p className={styles.sectionDescription}>Agora, algumas perguntas sobre o cenário de cuidados respiratórios que você vivencia.</p>
         <div className={styles.inputGroup}>
             <label>5. Você cuida de alguma criança que precise de cuidados respiratórios complexos (oxigênio, aspirador), mesmo sem traqueostomia?</label>
             <div className={styles.radioGroup}>
@@ -256,7 +317,7 @@ export default function Formulario() {
     </div>
   );
 
-
+  
   const renderStepContent = () => {
     if (formData.usaTraqueostomia === 'Não') {
       switch (step) {
@@ -280,7 +341,8 @@ export default function Formulario() {
 
   return (
     <form onSubmit={handleSubmit} className={styles.formContainer}>
-      <div className={styles.stepperContainer}>
+      <div ref={stepperPlaceholderRef} />
+      <div ref={stepperRef} className={styles.stepperContainer}>
         <div className={styles.stepperLine} style={{ width: `${(step / (totalSteps - 1)) * 100}%` }}></div>
         {stepsConfig.map((s, index) => (
           <div key={s.name} className={`${styles.stepItem} ${index <= step ? styles.active : ''}`}>
