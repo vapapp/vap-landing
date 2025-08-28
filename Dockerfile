@@ -1,6 +1,6 @@
 # Estágio 1: Instalação de TODAS as dependências (incluindo dev)
 # Isso é necessário porque o build do Next.js precisa de pacotes como TypeScript e ESLint.
-FROM node:18-alpine AS deps
+FROM node:20-alpine AS deps
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -9,7 +9,7 @@ RUN npm install
 # ---
 
 # Estágio 2: Build da aplicação
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copia as dependências já instaladas do estágio anterior
@@ -23,7 +23,7 @@ RUN npm run build
 # ---
 
 # Estágio 3: Imagem final de produção
-FROM node:18-alpine AS runner
+FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
