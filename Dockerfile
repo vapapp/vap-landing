@@ -1,19 +1,19 @@
 # Estágio 1: Instalação das dependências
-# Usamos uma imagem base leve do Node.js
-FROM node:18-alpine AS deps
+# ATUALIZADO: Usando Node.js v20 para compatibilidade com Firebase
+FROM node:20-alpine AS deps
 WORKDIR /app
 
 # Copia os arquivos de manifesto de pacotes
 COPY package.json package-lock.json ./
 
-# Instala as dependências de produção
+# Instala as dependências de produção (agora incluirá o TypeScript)
 RUN npm install --production
 
 # ---
 
 # Estágio 2: Build da aplicação
-# Usamos a mesma imagem base para consistência
-FROM node:18-alpine AS builder
+# ATUALIZADO: Usando Node.js v20 para consistência
+FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copia as dependências já instaladas do estágio anterior
@@ -28,8 +28,8 @@ RUN npm run build
 # ---
 
 # Estágio 3: Imagem final de produção
-# Usamos uma imagem ainda mais leve para a execução
-FROM node:18-alpine AS runner
+# ATUALIZADO: Usando Node.js v20 para a execução
+FROM node:20-alpine AS runner
 WORKDIR /app
 
 # Define o ambiente como produção
