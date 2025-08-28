@@ -1,5 +1,13 @@
 import styles from "./Termos.module.css";
 import Link from "next/link";
+import type { Metadata } from 'next';
+
+
+export const metadata: Metadata = {
+  title: 'Termos de Consentimento da Pesquisa',
+  description: 'Leia os termos de consentimento para participação na pesquisa de validação do VAP-App.',
+};
+
 
 export default function TermosDePesquisaPage() {
   return (
