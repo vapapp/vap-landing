@@ -38,9 +38,7 @@ interface CustomizedYAxisTickProps {
   };
 }
 
-const CustomizedYAxisTick: React.FunctionComponent<CustomizedYAxisTickProps> = (
-  props
-) => {
+const CustomizedYAxisTick: React.FC<CustomizedYAxisTickProps> = (props) => {
   const { x, y, payload } = props;
 
   if (typeof x !== "number" || typeof y !== "number" || !payload) {
@@ -49,7 +47,7 @@ const CustomizedYAxisTick: React.FunctionComponent<CustomizedYAxisTickProps> = (
 
   return (
     <g transform={`translate(${x},${y})`}>
-      <text x={0} y={0} dy={4} textAnchor="start" fill="#666" fontSize={12}>
+      <text x={0} y={0} dy={4} textAnchor="end" fill="#666" fontSize={12}>
         {payload.value}
       </text>
     </g>

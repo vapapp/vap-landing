@@ -1,174 +1,73 @@
 "use client";
 
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
-import ChartCard from "@/components/ui/ChartCard";
+import dynamic from "next/dynamic";
+import { Users, BarChart3, HeartPulse, ThumbsUp } from "lucide-react";
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF"];
+import StatCard from "@/components/ui/StatCard";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useSubmissions } from "@/hooks/useSubmissions";
+import styles from "./Dashboard.module.css";
 
-interface ChartEntry {
-  name: string;
-  value: number;
-}
+const DynamicVisaoGeralCharts = dynamic(
+  () => import("@/components/charts/VisaoGeralCharts"),
+  {
+    ssr: false,
+    loading: () => <LoadingSpinner />,
+  }
+);
 
-interface VisaoGeralChartsProps {
-  processedData: {
-    momentosUsoData: ChartEntry[];
-    medosData: ChartEntry[];
-    buscaInfoData: ChartEntry[];
-    beneficiosData: ChartEntry[];
-  };
-}
+export default function DashboardPage() {
+  const { processedData, loading, error } = useSubmissions();
 
-interface CustomizedYAxisTickProps {
-  x: number;
-  y: number;
-  payload: {
-    value: string;
-  };
-}
-
-const CustomizedYAxisTick = (props: CustomizedYAxisTickProps) => {
-  const { x, y, payload } = props;
   return (
-    <g transform={`translate(${x},${y})`}>
-      <text x={0} y={0} dy={4} textAnchor="start" fill="#666" fontSize={12}>
-        {payload.value}
-      </text>
-    </g>
-  );
-};
-
-const VisaoGeralCharts = ({ processedData }: VisaoGeralChartsProps) => {
-  return (
-    <>
-      <ChartCard
-        title="Momentos de Maior Uso do App"
-        tooltipText="Agrupamento de respostas da pergunta: 'Em qual destes momentos você acredita que MAIS usaria o VAP-App?'"
-      >
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={processedData.momentosUsoData}
-            layout="vertical"
-            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-          >
-            <XAxis type="number" hide />
-            <YAxis
-              type="category"
-              dataKey="name"
-              width={150}
-              tickLine={false}
-              axisLine={false}
-              interval={0}
-              tick={<CustomizedYAxisTick />}
+    <div>
+      <h1 className={styles.title}>Visão Geral</h1>
+      {loading && <LoadingSpinner />}
+      {error && (
+        <p className={styles.error}>Ocorreu um erro ao carregar os dados.</p>
+      )}
+      {processedData && (
+        <>
+          <div className={styles.grid}>
+            <StatCard
+              title="Total de Respostas"
+              value={processedData.totalRespostas}
+              icon={<Users size={24} />}
+              color="blue"
+              tooltipText="Número total de questionários enviados."
             />
-            <Tooltip cursor={{ fill: "#f7fafc" }} />
-            <Bar dataKey="value" fill="#8884d8" radius={[0, 4, 4, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </ChartCard>
-
-      <ChartCard
-        title="Principais Medos em Emergência"
-        tooltipText="Agrupamento de respostas da pergunta: 'Pensando em momentos de crise, qual é o seu maior medo?'"
-      >
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={processedData.medosData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={80}
-              fill="#8884d8"
-              paddingAngle={5}
-            >
-              {processedData.medosData?.map(
-                (_entry: ChartEntry, index: number) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                )
-              )}
-            </Pie>
-            <Tooltip />
-            <Legend iconSize={10} />
-          </PieChart>
-        </ResponsiveContainer>
-      </ChartCard>
-
-      <ChartCard
-        title="Onde Buscam Informação"
-        tooltipText="Agrupamento de respostas da pergunta: 'Quando tem uma dúvida, onde você busca informação primeiro?'"
-      >
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={processedData.buscaInfoData}
-            layout="vertical"
-            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-          >
-            <XAxis type="number" hide />
-            <YAxis
-              type="category"
-              dataKey="name"
-              width={150}
-              tickLine={false}
-              axisLine={false}
-              interval={0}
-              tick={<CustomizedYAxisTick />}
+            <StatCard
+              title="Taxa de Confiança"
+              value={`${processedData.taxaConfianca}%`}
+              icon={<ThumbsUp size={24} />}
+              color="green"
+              tooltipText="Percentual de cuidadores que se sentem 'Confiantes' ou 'Muito Confiantes' nos cuidados."
             />
-            <Tooltip cursor={{ fill: "#f7fafc" }} />
-            <Bar dataKey="value" fill="#00C49F" radius={[0, 4, 4, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </ChartCard>
+            <StatCard
+              title="Índice de Necessidade"
+              value={`${processedData.necessidadeAlta}%`}
+              icon={<HeartPulse size={24} />}
+              color="red"
+              tooltipText="Percentual de cuidadores que relataram sentir solidão 'Quase todos os dias' ou cujo maior medo é 'Não saber o que fazer a tempo'."
+            />
+            <StatCard
+              title="Satisfação com o App"
+              value={`${processedData.satisfacaoApp}%`}
+              icon={<BarChart3 size={24} />}
+              color="purple"
+              tooltipText="Percentual de avaliações 'Essencial' ou 'Muito Útil' para as funcionalidades propostas."
+            />
+          </div>
 
-      <ChartCard
-        title="Principais Benefícios Esperados"
-        tooltipText="Agrupamento de respostas da pergunta: 'Qual seria o maior benefício que um aplicativo como o VAP-App poderia trazer para a sua vida?'"
-      >
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={processedData.beneficiosData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={80}
-              fill="#8884d8"
-              paddingAngle={5}
-            >
-              {processedData.beneficiosData?.map(
-                (_entry: ChartEntry, index: number) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                )
-              )}
-            </Pie>
-            <Tooltip />
-            <Legend iconSize={10} />
-          </PieChart>
-        </ResponsiveContainer>
-      </ChartCard>
-    </>
+          <div
+            className={`${styles.grid} ${styles.fullWidth}`}
+            style={{ marginTop: "1.5rem" }}
+          >
+            <DynamicVisaoGeralCharts processedData={processedData} />
+          </div>
+        </>
+      )}
+      {!loading && !processedData && <p>Nenhuma resposta foi enviada ainda.</p>}
+    </div>
   );
-};
-
-export default VisaoGeralCharts;
+}
