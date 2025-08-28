@@ -40,7 +40,10 @@ const ComportamentoCharts = ({
 
   return (
     <>
-      <ChartCard title="Frequência de Solidão">
+      <ChartCard
+        title="Frequência de Solidão"
+        tooltipText="Agrupamento de respostas da pergunta: 'Com que frequência você se sente sozinho(a) e sem apoio?'"
+      >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={processedData.solidaoData}>
             <XAxis
@@ -56,7 +59,10 @@ const ComportamentoCharts = ({
         </ResponsiveContainer>
       </ChartCard>
 
-      <ChartCard title="Status Intubação (Não TQT)">
+      <ChartCard
+        title="Status Intubação (Não TQT)"
+        tooltipText="Agrupamento de respostas da pergunta: 'Seu filho já foi intubado?' (Apenas para cuidadores de crianças sem traqueostomia)."
+      >
         <StatusChart
           data={processedData.intubacaoData || []}
           total={naoTqtSubmissionsCount}
@@ -70,16 +76,19 @@ const ComportamentoCharts = ({
               value={`${processedData.insightUsoDiario}%`}
               description="Usariam o app no dia a dia"
               color="blue"
+              tooltipText="Percentagem de cuidadores que selecionaram 'No dia a dia, para organizar a rotina' como o principal momento de uso do app."
             />
             <InsightCard
               value={`${processedData.insightUsoEmergencia}%`}
               description="Usariam o app em emergências"
               color="red"
+              tooltipText="Percentagem de cuidadores que selecionaram 'Em uma emergência, para saber o que fazer rapidamente' como o principal momento de uso do app."
             />
             <InsightCard
               value={`${processedData.insightAcreditamUtil}%`}
               description="Acreditam que seria útil (Não TQT)"
               color="green"
+              tooltipText="Percentagem de cuidadores de crianças SEM traqueostomia que responderam 'Sim, com certeza seria muito útil' para a utilidade do app em outras condições."
             />
           </div>
         </ChartCard>

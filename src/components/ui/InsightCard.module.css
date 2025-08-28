@@ -9,8 +9,15 @@
   margin-bottom: 0.25rem;
 }
 
+.descriptionContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .description {
   font-size: 0.9rem;
+  margin: 0;
 }
 
 .blue {

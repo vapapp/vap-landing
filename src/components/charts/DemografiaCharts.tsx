@@ -42,7 +42,10 @@ interface DemografiaChartsProps {
 const DemografiaCharts = ({ processedData }: DemografiaChartsProps) => {
   return (
     <>
-      <ChartCard title="Nível de Escolaridade">
+      <ChartCard
+        title="Nível de Escolaridade"
+        tooltipText="Agrupamento de respostas da pergunta: 'Qual seu nível de estudo?'"
+      >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={processedData.escolaridadeData}>
             <XAxis
@@ -58,7 +61,10 @@ const DemografiaCharts = ({ processedData }: DemografiaChartsProps) => {
           </BarChart>
         </ResponsiveContainer>
       </ChartCard>
-      <ChartCard title="Parentesco com a Criança">
+      <ChartCard
+        title="Parentesco com a Criança"
+        tooltipText="Agrupamento de respostas da pergunta: 'Qual seu principal parentesco com a criança?'"
+      >
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -86,7 +92,10 @@ const DemografiaCharts = ({ processedData }: DemografiaChartsProps) => {
           </PieChart>
         </ResponsiveContainer>
       </ChartCard>
-      <ChartCard title="Nível de Confiança nos Cuidados">
+      <ChartCard
+        title="Nível de Confiança nos Cuidados"
+        tooltipText="Agrupamento de respostas da pergunta: 'Como você avalia sua confiança hoje no cuidado da traqueostomia?'"
+      >
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={processedData.confiancaData}

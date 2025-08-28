@@ -1,131 +1,174 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import StatCard from "@/components/ui/StatCard";
-import { useSubmissions } from "@/hooks/useSubmissions";
-import styles from "./Dashboard.module.css";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
+import ChartCard from "@/components/ui/ChartCard";
 
-const UsersIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-    <circle cx="9" cy="7" r="4"></circle>
-    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-  </svg>
-);
-const HeartIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-  </svg>
-);
-const AlertIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="12" r="10"></circle>
-    <line x1="12" y1="8" x2="12" y2="12"></line>
-    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-  </svg>
-);
-const TrendingUpIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-    <polyline points="17 6 23 6 23 12"></polyline>
-  </svg>
-);
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF"];
 
-const DynamicVisaoGeralCharts = dynamic(
-  () => import("@/components/charts/VisaoGeralCharts"),
-  {
-    ssr: false,
-    loading: () => <LoadingSpinner />,
-  }
-);
-
-function VisaoGeralPage() {
-  const { processedData, loading, error } = useSubmissions();
-
-  return (
-    <div>
-      <h1 className={styles.title}>Visão Geral</h1>
-
-      {loading && <LoadingSpinner />}
-      {error && (
-        <p className={styles.error}>Ocorreu um erro ao carregar os dados.</p>
-      )}
-
-      {processedData && (
-        <div className={styles.grid}>
-          <StatCard
-            title="Total de Respostas"
-            value={processedData.totalRespostas}
-            icon={<UsersIcon />}
-            color="blue"
-          />
-          <StatCard
-            title="Taxa de Confiança"
-            value={`${processedData.taxaConfianca}%`}
-            icon={<HeartIcon />}
-            color="green"
-          />
-          <StatCard
-            title="Necessidade Alta"
-            value={`${processedData.necessidadeAlta}%`}
-            icon={<AlertIcon />}
-            color="red"
-          />
-          <StatCard
-            title="Satisfação App"
-            value={`${processedData.satisfacaoApp}%`}
-            icon={<TrendingUpIcon />}
-            color="purple"
-          />
-          <DynamicVisaoGeralCharts processedData={processedData} />
-        </div>
-      )}
-
-      {!loading && !processedData && <p>Nenhuma resposta foi enviada ainda.</p>}
-    </div>
-  );
+interface ChartEntry {
+  name: string;
+  value: number;
 }
 
-export default VisaoGeralPage;
+interface VisaoGeralChartsProps {
+  processedData: {
+    momentosUsoData: ChartEntry[];
+    medosData: ChartEntry[];
+    buscaInfoData: ChartEntry[];
+    beneficiosData: ChartEntry[];
+  };
+}
+
+interface CustomizedYAxisTickProps {
+  x: number;
+  y: number;
+  payload: {
+    value: string;
+  };
+}
+
+const CustomizedYAxisTick = (props: CustomizedYAxisTickProps) => {
+  const { x, y, payload } = props;
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={4} textAnchor="start" fill="#666" fontSize={12}>
+        {payload.value}
+      </text>
+    </g>
+  );
+};
+
+const VisaoGeralCharts = ({ processedData }: VisaoGeralChartsProps) => {
+  return (
+    <>
+      <ChartCard
+        title="Momentos de Maior Uso do App"
+        tooltipText="Agrupamento de respostas da pergunta: 'Em qual destes momentos você acredita que MAIS usaria o VAP-App?'"
+      >
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={processedData.momentosUsoData}
+            layout="vertical"
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          >
+            <XAxis type="number" hide />
+            <YAxis
+              type="category"
+              dataKey="name"
+              width={150}
+              tickLine={false}
+              axisLine={false}
+              interval={0}
+              tick={<CustomizedYAxisTick />}
+            />
+            <Tooltip cursor={{ fill: "#f7fafc" }} />
+            <Bar dataKey="value" fill="#8884d8" radius={[0, 4, 4, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </ChartCard>
+
+      <ChartCard
+        title="Principais Medos em Emergência"
+        tooltipText="Agrupamento de respostas da pergunta: 'Pensando em momentos de crise, qual é o seu maior medo?'"
+      >
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={processedData.medosData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              innerRadius={60}
+              outerRadius={80}
+              fill="#8884d8"
+              paddingAngle={5}
+            >
+              {processedData.medosData?.map(
+                (_entry: ChartEntry, index: number) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                )
+              )}
+            </Pie>
+            <Tooltip />
+            <Legend iconSize={10} />
+          </PieChart>
+        </ResponsiveContainer>
+      </ChartCard>
+
+      <ChartCard
+        title="Onde Buscam Informação"
+        tooltipText="Agrupamento de respostas da pergunta: 'Quando tem uma dúvida, onde você busca informação primeiro?'"
+      >
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={processedData.buscaInfoData}
+            layout="vertical"
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          >
+            <XAxis type="number" hide />
+            <YAxis
+              type="category"
+              dataKey="name"
+              width={150}
+              tickLine={false}
+              axisLine={false}
+              interval={0}
+              tick={<CustomizedYAxisTick />}
+            />
+            <Tooltip cursor={{ fill: "#f7fafc" }} />
+            <Bar dataKey="value" fill="#00C49F" radius={[0, 4, 4, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </ChartCard>
+
+      <ChartCard
+        title="Principais Benefícios Esperados"
+        tooltipText="Agrupamento de respostas da pergunta: 'Qual seria o maior benefício que um aplicativo como o VAP-App poderia trazer para a sua vida?'"
+      >
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={processedData.beneficiosData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              innerRadius={60}
+              outerRadius={80}
+              fill="#8884d8"
+              paddingAngle={5}
+            >
+              {processedData.beneficiosData?.map(
+                (_entry: ChartEntry, index: number) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                )
+              )}
+            </Pie>
+            <Tooltip />
+            <Legend iconSize={10} />
+          </PieChart>
+        </ResponsiveContainer>
+      </ChartCard>
+    </>
+  );
+};
+
+export default VisaoGeralCharts;
