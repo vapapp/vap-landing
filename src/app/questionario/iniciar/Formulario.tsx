@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from 'react';
-import Link from 'next/link'; 
+import Link from 'next/link';
 import { useQuestionarioForm } from '@/hooks/useQuestionarioForm';
 import Toast from '@/components/ui/Toast';
 import styles from './Questionario.module.css';
+// CORREÇÃO: Importa o tipo FormData do novo local centralizado
+import { type FormData } from '@/types';
 import {
   nivelEstudoOptions,
   parentescoOptions,
@@ -25,7 +27,6 @@ import {
   utilidadeOutrasCondicoesOptions,
   funcionalidadesOptions,
   avaliacaoOptions,
-  type FormData,
 } from './constants';
 
 
@@ -78,7 +79,7 @@ export default function Formulario() {
       },
       { rootMargin: '-1px 0px 0px 0px', threshold: 1.0 }
     );
-    
+
     observer.observe(placeholder);
 
     return () => {
@@ -86,7 +87,7 @@ export default function Formulario() {
     };
   }, []);
 
-  
+
   useEffect(() => {
     if (step > prevStepRef.current) {
       window.scrollTo({
@@ -138,11 +139,11 @@ export default function Formulario() {
           <RadioOption name="usaTraqueostomia" value="Não" checked={formData.usaTraqueostomia === 'Não'} onChange={handleRadioChange} />
         </div>
       </div>
-      
+
       <div className={styles.consentGroup}>
         <label className={styles.consentLabel}>
-          <input 
-            type="checkbox" 
+          <input
+            type="checkbox"
             name="aceitouTermosPesquisa"
             checked={!!formData.aceitouTermosPesquisa}
             onChange={handleCheckboxChange}
@@ -155,8 +156,8 @@ export default function Formulario() {
       </div>
       <div className={styles.consentGroup}>
         <label className={styles.consentLabel}>
-          <input 
-            type="checkbox" 
+          <input
+            type="checkbox"
             name="aceitouContatoFuturo"
             checked={!!formData.aceitouContatoFuturo}
             onChange={handleCheckboxChange}
@@ -273,7 +274,7 @@ export default function Formulario() {
                 {pensouComprarDispositivoOptions.map(o => <RadioOption key={o} name="pensouComprarDispositivo" value={o} checked={formData.pensouComprarDispositivo === o} onChange={handleRadioChange} />)}
             </div>
         </div>
-        
+
         {formData.pensouComprarDispositivo && formData.pensouComprarDispositivo !== 'Não, nunca precisei' && formData.pensouComprarDispositivo !== 'Não sabia que era possível comprar por conta própria' && (
             <div className={styles.inputGroup}>
                 <label>3. Se já pensou em comprar, qual foi a maior dificuldade?</label>
@@ -284,7 +285,7 @@ export default function Formulario() {
         )}
     </div>
   );
-  
+
   const renderExperienciaNaoTQTStep = () => (
     <div className={styles.formStep}>
         <h2>Sua Experiência Hospitalar</h2>
@@ -295,7 +296,7 @@ export default function Formulario() {
                 {filhoIntubadoOptions.map(o => <RadioOption key={o} name="filhoIntubado" value={o} checked={formData.filhoIntubado === o} onChange={handleRadioChange} />)}
             </div>
         </div>
-       
+
         {formData.filhoIntubado && !formData.filhoIntubado.startsWith('Não') && (
             <>
                 <div className={styles.inputGroup}>
@@ -348,7 +349,7 @@ export default function Formulario() {
     </div>
   );
 
-  
+
   const renderStepContent = () => {
     if (formData.usaTraqueostomia === 'Não') {
       switch (step) {
@@ -396,10 +397,10 @@ export default function Formulario() {
           </button>
         )}
         {step < totalSteps - 1 ? (
-          <button 
-            type="button" 
-            onClick={nextStep} 
-            className={styles.nextButton} 
+          <button
+            type="button"
+            onClick={nextStep}
+            className={styles.nextButton}
             disabled={(step === 0 && !formData.usaTraqueostomia) || (step === 0 && !formData.aceitouTermosPesquisa)}
           >
             Próximo
