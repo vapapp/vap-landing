@@ -11,6 +11,15 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+for (const [key, value] of Object.entries(firebaseConfig)) {
+  if (!value) {
+    throw new Error(
+      `Variável de ambiente Firebase ausente: ${key}. Verifique seu arquivo .env ou as configurações de ambiente.`
+    );
+  }
+}
+
+
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 const db = getFirestore(app);
