@@ -10,7 +10,7 @@ COPY package.json package-lock.json ./
 RUN npm install --production
 
 # ---
-
+ 
 # Estágio 2: Build da aplicação
 # ATUALIZADO: Usando Node.js v20 para consistência
 FROM node:20-alpine AS builder
