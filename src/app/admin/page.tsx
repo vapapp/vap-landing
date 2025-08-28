@@ -21,7 +21,7 @@ export default function AdminLoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/admin/dashboard");
-    } catch (err) {
+    } catch {
       setError("E-mail ou senha inválidos. Tente novamente.");
       setIsLoading(false);
     }
