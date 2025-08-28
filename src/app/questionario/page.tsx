@@ -1,5 +1,12 @@
 import Link from 'next/link';
 import styles from './Welcome.module.css';
+import type { Metadata } from 'next';
+
+
+export const metadata: Metadata = {
+  title: 'Participe da Pesquisa',
+  description: 'Ajude a construir uma ferramenta de apoio para cuidadores de crianças com necessidades respiratórias. Responda nosso questionário de 5 minutos.',
+};
 
 export default function WelcomePage() {
   return (

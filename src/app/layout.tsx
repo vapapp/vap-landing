@@ -13,9 +13,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+
 export const metadata: Metadata = {
-  title: "VAP-App",
-  description: "Validação e Administração",
+  title: {
+    template: "%s | VAP-App", 
+    default: "VAP-App: Apoio para Cuidadores de Crianças com Traqueostomia", 
+  },
+  description:
+    "Uma plataforma de apoio e validação para cuidadores de crianças com traqueostomia e outras necessidades respiratórias complexas.",
 };
 
 export default function RootLayout({
