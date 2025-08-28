@@ -12,7 +12,7 @@ import ChartCard from "@/components/ui/ChartCard";
 import InsightCard from "@/components/ui/InsightCard";
 import StatusChart from "@/components/charts/StatusChart";
 import styles from "@/app/admin/dashboard/Dashboard.module.css";
-import { Submission } from "@/hooks/useSubmissions";
+import { Submission } from "@/types";
 
 interface ChartEntry {
   name: string;
