@@ -30,7 +30,10 @@ function FuncionalidadesPage() {
       )}
       {processedData && (
         <div className={`${styles.grid} ${styles.fullWidth}`}>
-          <ChartCard title="Avaliação de cada funcionalidade pelos cuidadores">
+          <ChartCard
+            title="Avaliação de cada funcionalidade pelos cuidadores"
+            tooltipText="Cada barra representa uma funcionalidade proposta. As cores indicam a percentagem de cuidadores que avaliaram aquela funcionalidade como 'Essencial', 'Muito Útil', 'Útil', etc. A percentagem ao lado do título soma 'Essencial' e 'Muito Útil'."
+          >
             <DynamicFuncionalidadesChart
               data={processedData.funcionalidadesData || []}
             />

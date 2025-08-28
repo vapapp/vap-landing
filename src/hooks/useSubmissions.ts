@@ -15,6 +15,8 @@ import {
   momentoUsoAppOptions,
   utilidadeOutrasCondicoesOptions,
   nivelEstudoOptions,
+  buscaInformacaoOptions,
+  maiorBeneficioOptions,
 } from "@/app/questionario/iniciar/constants";
 
 export interface Submission extends DocumentData {
@@ -142,16 +144,74 @@ export const useSubmissions = () => {
       [confiancaCuidadoOptions[3]]: "Inseguro",
     };
 
+    const momentosUsoMap: { [key: string]: string } = {
+      [momentoUsoAppOptions[0]]: "Emergencia",
+      [momentoUsoAppOptions[1]]: "Dia a dia",
+      [momentoUsoAppOptions[2]]: "Duvidas especificas",
+      [momentoUsoAppOptions[3]]: "Antes consulta",
+    };
+
+    const buscaInfoMap: { [key: string]: string } = {
+      [buscaInformacaoOptions[0]]: "Liga med/hos",
+      [buscaInformacaoOptions[1]]: "Google e sites",
+      [buscaInformacaoOptions[2]]: "Apps e redes",
+      [buscaInformacaoOptions[3]]: "Material impresso",
+      [buscaInformacaoOptions[4]]: "Nao sei onde",
+    };
+
+    const beneficiosMap: { [key: string]: string } = {
+      [maiorBeneficioOptions[0]]: "Mais segurança",
+      [maiorBeneficioOptions[1]]: "Organizacao/tempo",
+      [maiorBeneficioOptions[2]]: "Menos solidão",
+      [maiorBeneficioOptions[3]]: "Acesso informação",
+    };
+
     const escolaridadeData = calculateCounts(
       submissions,
       "nivelEstudo",
       escolaridadeMap
     );
     const parentescoData = calculateCounts(tqtSubmissions, "parentesco");
-    const momentosUsoData = calculateCounts(tqtSubmissions, "momentoUsoApp");
+
+    const momentosUsoDataRaw = calculateCounts(
+      tqtSubmissions,
+      "momentoUsoApp",
+      momentosUsoMap
+    );
+    const buscaInfoDataRaw = calculateCounts(
+      tqtSubmissions,
+      "buscaInformacao",
+      buscaInfoMap
+    );
+    const beneficiosData = calculateCounts(
+      tqtSubmissions,
+      "maiorBeneficio",
+      beneficiosMap
+    );
+
+    const momentosUsoOrder = Object.values(momentosUsoMap);
+    const momentosUsoData = momentosUsoOrder
+      .map(
+        (name) =>
+          momentosUsoDataRaw.find((item) => item.name === name) || {
+            name,
+            value: 0,
+          }
+      )
+      .filter((item) => item.value > 0);
+
+    const buscaInfoOrder = Object.values(buscaInfoMap);
+    const buscaInfoData = buscaInfoOrder
+      .map(
+        (name) =>
+          buscaInfoDataRaw.find((item) => item.name === name) || {
+            name,
+            value: 0,
+          }
+      )
+      .filter((item) => item.value > 0);
+
     const medosData = calculateCounts(tqtSubmissions, "maiorMedo");
-    const buscaInfoData = calculateCounts(tqtSubmissions, "buscaInformacao");
-    const beneficiosData = calculateCounts(tqtSubmissions, "maiorBeneficio");
     const solidaoData = calculateCounts(tqtSubmissions, "sentimentoApoio");
 
     const confiancaDataRaw = calculateCounts(
