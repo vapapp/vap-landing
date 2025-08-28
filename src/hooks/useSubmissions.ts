@@ -5,10 +5,11 @@ import {
   collection,
   onSnapshot,
   query,
-  DocumentData,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
+// Importa o tipo centralizado
+import { Submission } from "@/types";
 import {
   funcionalidadesOptions,
   confiancaCuidadoOptions,
@@ -18,10 +19,6 @@ import {
   buscaInformacaoOptions,
   maiorBeneficioOptions,
 } from "@/app/questionario/iniciar/constants";
-
-export interface Submission extends DocumentData {
-  id: string;
-}
 
 const calculateCounts = (
   data: Submission[],
