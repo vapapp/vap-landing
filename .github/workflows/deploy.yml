@@ -1,28 +1,63 @@
-name: Deploy to VPS
+name: Deploy to VPS with Docker
 
-# Dispara a action em todo push para a branch 'main'
 on:
   push:
     branches:
       - main
-      
+
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
-    - name: Install SSH Key
-      uses: shimataro/ssh-key-action@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
       with:
-        key: ${{ secrets.VPS_SSH_KEY }}
-        known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
-        
-    - name: Adding Known Hosts
-      run: ssh-keyscan -H ${{ secrets.VPS_SSH_HOST }} >> ~/.ssh/known_hosts
-      
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        # IMPORTANTE: Substitua 'seu-usuario/vap-landing' pelo nome do seu repositório no Docker Hub
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/vap-landing:latest
+        # Passa as variáveis de ambiente do GitHub Secrets para o build do Docker
+        build-args: |
+          NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+
     - name: Deploy to VPS
-      run: |
-        ssh ${{ secrets.VPS_SSH_USER }}@${{ secrets.VPS_SSH_HOST }} '~/deploy.sh'
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.VPS_SSH_HOST }}
+        username: ${{ secrets.VPS_SSH_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          # NOVO: Faz o login no Docker Hub na VPS para poder puxar a imagem privada
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          
+          # Puxa a imagem mais recente do Docker Hub
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/vap-landing:latest
+          
+          # Para e remove o container antigo, se existir
+          docker stop vap-landing-container || true
+          docker rm vap-landing-container || true
+          
+          # Inicia um novo container com a imagem atualizada
+          docker run -d --restart always \
+            -p 3001:3001 \
+            --name vap-landing-container \
+            ${{ secrets.DOCKERHUB_USERNAME }}/vap-landing:latest
