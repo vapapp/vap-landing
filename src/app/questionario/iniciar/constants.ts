@@ -1,35 +1,8 @@
 /**
- * Tipos e constantes para o formulário do questionário.
+ * Constantes para o formulário do questionário.
  */
 
-// Define a estrutura dos dados do formulário
-export interface FormData {
-  [key: string]: string | boolean | undefined; 
-  nome?: string;
-  contato?: string;
-  nivelEstudo?: string;
-  usaTraqueostomia?: 'Sim' | 'Não' | '';
-  aceitouTermosPesquisa?: boolean; 
-  aceitouContatoFuturo?: boolean; 
-  parentesco?: string;
-  maiorMedo?: string;
-  sentimentoApoio?: string;
-  confiancaCuidado?: string;
-  buscaInformacao?: string;
-  momentoUsoApp?: string;
-  importanciaApp?: string;
-  maiorBeneficio?: string;
-  cuidaOutraCondicao?: 'Sim' | 'Não';
-  utilidadeOutrasCondicoes?: string;
-  filhoIntubado?: string;
-  sabiaRiscosIntubacao?: string;
-  explicaramRiscosTQT?: string;
-  medoIntubacao?: string;
-  importanciaVozFamilias?: string;
-  pensouComprarDispositivo?: string;
-  dificuldadeCompra?: string;
-}
-
+// A interface FormData foi movida para src/types/index.ts
 
 export const nivelEstudoOptions = [
   'Não estudei',
@@ -155,28 +128,28 @@ export const utilidadeOutrasCondicoesOptions = [
 
 
 export const funcionalidadesOptions = [
-  { 
-    id: 'guia_emergencia', 
+  {
+    id: 'guia_emergencia',
     label: 'Guia de emergência',
     description: 'Passo a passo para obstrução, sangramento ou saída da cânula.'
   },
-  { 
-    id: 'videos_curtos', 
+  {
+    id: 'videos_curtos',
     label: 'Vídeos curtos',
     description: 'Mostrando como fazer a troca de cânula, aspiração e limpeza.'
   },
-  { 
-    id: 'ia_sintomas', 
+  {
+    id: 'ia_sintomas',
     label: 'Assistente Inteligente (IA)',
     description: 'Ajuda a identificar um problema com base nos sintomas descritos.'
   },
-  { 
-    id: 'diario_eventos', 
+  {
+    id: 'diario_eventos',
     label: 'Diário de eventos',
     description: 'Para registrar e criar um histórico fácil de compartilhar com médicos.'
   },
-  { 
-    id: 'comunidade_segura', 
+  {
+    id: 'comunidade_segura',
     label: 'Comunidade segura',
     description: 'Para conversar e trocar experiências com outras famílias.'
   },
