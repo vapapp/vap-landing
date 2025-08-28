@@ -1,37 +1,41 @@
-# Estágio 1: Instalação das dependências
-FROM node:20-alpine AS deps
+# Estágio 1: Instalação de TODAS as dependências (incluindo dev)
+# Isso é necessário porque o build do Next.js precisa de pacotes como TypeScript e ESLint.
+FROM node:18-alpine AS deps
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm install --production
+RUN npm install
 
 # ---
 
 # Estágio 2: Build da aplicação
-FROM node:20-alpine AS builder
+FROM node:18-alpine AS builder
 WORKDIR /app
 
+# Copia as dependências já instaladas do estágio anterior
 COPY --from=deps /app/node_modules ./node_modules
+# Copia o restante do código da aplicação
 COPY . .
 
-# O .env.production será criado pelo GitHub Actions antes deste passo
+# As variáveis de ambiente serão injetadas aqui pelo GitHub Actions
 RUN npm run build
 
 # ---
 
 # Estágio 3: Imagem final de produção
-FROM node:20-alpine AS runner
+FROM node:18-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 
+# Copia os arquivos de build do estágio 'builder'
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
-# ADICIONADO: Copia o arquivo .env.production para a imagem final
-COPY --from=builder /app/.env.production ./.env.production
+# Remove as dependências de desenvolvimento para deixar a imagem final mais leve
+RUN npm prune --omit=dev
 
 EXPOSE 3001
 CMD ["npm", "start"]
