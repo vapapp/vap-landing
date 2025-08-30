@@ -8,6 +8,14 @@
 }
 
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ffffff;
+    --foreground: #111827;
+  }
+}
+
+
 html {
   color-scheme: light;
 }

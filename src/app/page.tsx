@@ -1,5 +1,5 @@
-import Squares from "../components/ui/Squares";
-import { TerminalLoader } from "../components/ui/TerminalLoader";
+import { Hero } from "../components/ui/Hero";
+import LightRays from "../components/ui/LightRays"; 
 import styles from './Home.module.css';
 
 export default function HomePage() {
@@ -7,19 +7,21 @@ export default function HomePage() {
     <main className={styles.main}>
    
       <div className={styles.background}>
-        <Squares
-          speed={0.3}
-          squareSize={40}
-          direction="diagonal"
-          borderColor="#00ff00" 
-          hoverFillColor="#333"
+        <LightRays
+          raysOrigin="top-center"
+          raysColor="#00949D" 
+          raysSpeed={0.8}
+          lightSpread={0.7}
+          rayLength={1.2}
+          followMouse={true}
+          mouseInfluence={0.1}
+          noiseAmount={0.05}
+          distortion={0.05}
         />
       </div>
 
-     
       <div className={styles.content}>
-        
-        <TerminalLoader />
+        <Hero />
       </div>
     </main>
   );
