@@ -24,9 +24,14 @@ const calculateCounts = (
   const counts: { [key: string]: number } = {};
   for (const item of data) {
     const value = item[key];
-    if (value) {
+    if (value && typeof value === 'string') {
       const mappedName = nameMap && nameMap[value] ? nameMap[value] : value;
       counts[mappedName] = (counts[mappedName] || 0) + 1;
+    } else if (Array.isArray(value)) {
+      value.forEach(v => {
+        const mappedName = nameMap && nameMap[v] ? nameMap[v] : v;
+        counts[mappedName] = (counts[mappedName] || 0) + 1;
+      });
     }
   }
   return Object.entries(counts).map(([name, value]) => ({ name, value }));
@@ -105,13 +110,10 @@ export function processSubmissionsData(submissions: Submission[]) {
     [confiancaCuidadoOptions[2]]: "Pouco Confiante",
     [confiancaCuidadoOptions[3]]: "Inseguro",
   };
+  
+  const momentosUsoMap: { [key: string]: string } = {};
+  momentoUsoAppOptions.forEach(o => { momentosUsoMap[o] = o; });
 
-  const momentosUsoMap: { [key: string]: string } = {
-    [momentoUsoAppOptions[0]]: "Emergencia",
-    [momentoUsoAppOptions[1]]: "Dia a dia",
-    [momentoUsoAppOptions[2]]: "Duvidas especificas",
-    [momentoUsoAppOptions[3]]: "Antes consulta",
-  };
 
   const buscaInfoMap: { [key: string]: string } = {
     [buscaInformacaoOptions[0]]: "Liga med/hos",
@@ -134,12 +136,7 @@ export function processSubmissionsData(submissions: Submission[]) {
     escolaridadeMap
   );
   const parentescoData = calculateCounts(tqtSubmissions, "parentesco");
-
-  const momentosUsoDataRaw = calculateCounts(
-    tqtSubmissions,
-    "momentoUsoApp",
-    momentosUsoMap
-  );
+  const momentosUsoData = calculateCounts(tqtSubmissions, "momentoUsoApp", momentosUsoMap);
   const buscaInfoDataRaw = calculateCounts(
     tqtSubmissions,
     "buscaInformacao",
@@ -150,18 +147,7 @@ export function processSubmissionsData(submissions: Submission[]) {
     "maiorBeneficio",
     beneficiosMap
   );
-
-  const momentosUsoOrder = Object.values(momentosUsoMap);
-  const momentosUsoData = momentosUsoOrder
-    .map(
-      (name) =>
-        momentosUsoDataRaw.find((item) => item.name === name) || {
-          name,
-          value: 0,
-        }
-    )
-    .filter((item) => item.value > 0);
-
+  
   const buscaInfoOrder = Object.values(buscaInfoMap);
   const buscaInfoData = buscaInfoOrder
     .map(
@@ -210,7 +196,7 @@ export function processSubmissionsData(submissions: Submission[]) {
   const insightUsoDiario =
     tqtSubmissions.length > 0
       ? (tqtSubmissions.filter(
-          (s) => s.momentoUsoApp === momentoUsoAppOptions[1]
+          (s) => Array.isArray(s.momentoUsoApp) && s.momentoUsoApp.includes(momentoUsoAppOptions[1])
         ).length /
           tqtSubmissions.length) *
         100
@@ -218,11 +204,12 @@ export function processSubmissionsData(submissions: Submission[]) {
   const insightUsoEmergencia =
     tqtSubmissions.length > 0
       ? (tqtSubmissions.filter(
-          (s) => s.momentoUsoApp === momentoUsoAppOptions[0]
+          (s) => Array.isArray(s.momentoUsoApp) && s.momentoUsoApp.includes(momentoUsoAppOptions[0])
         ).length /
           tqtSubmissions.length) *
         100
       : 0;
+
   const insightAcreditamUtil =
     naoTqtSubmissions.length > 0
       ? (naoTqtSubmissions.filter(
@@ -232,6 +219,22 @@ export function processSubmissionsData(submissions: Submission[]) {
           naoTqtSubmissions.length) *
         100
       : 0;
+
+  const riscoGraveData = calculateCounts(tqtSubmissions, "riscoGrave");
+  const apoioComunidadeData = calculateCounts(tqtSubmissions, "apoioComunidade");
+  const vozFamiliasData = calculateCounts(tqtSubmissions, "importanciaVozFamilias");
+  const pensouComprarData = calculateCounts(tqtSubmissions, "pensouComprarDispositivo");
+  const dificuldadeCompraData = calculateCounts(
+    tqtSubmissions.filter(
+      (s) =>
+        s.pensouComprarDispositivo &&
+        s.pensouComprarDispositivo !== "Não, nunca precisei" &&
+        s.pensouComprarDispositivo !==
+          "Não sabia que era possível comprar por conta própria"
+    ),
+    "dificuldadeCompra"
+  );
+
 
   return {
     totalRespostas,
@@ -251,5 +254,10 @@ export function processSubmissionsData(submissions: Submission[]) {
     insightUsoDiario: Math.round(insightUsoDiario),
     insightUsoEmergencia: Math.round(insightUsoEmergencia),
     insightAcreditamUtil: Math.round(insightAcreditamUtil),
+    riscoGraveData,
+    apoioComunidadeData,
+    vozFamiliasData,
+    pensouComprarData,
+    dificuldadeCompraData,
   };
 }

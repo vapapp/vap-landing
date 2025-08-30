@@ -18,71 +18,58 @@ export default function TermosDePesquisaPage() {
         </h1>
 
         <p>
-          Agradecemos seu interesse em participar da pesquisa de validação do
-          VAP-App. Antes de começar, por favor, leia atentamente as informações
-          abaixo.
+          Agradecemos seu interesse em participar da pesquisa de desenvolvimento do
+          VAP-App. Antes de prosseguir, é fundamental que você leia atentamente as informações
+          abaixo para tomar uma decisão informada.
         </p>
 
         <section>
           <h2 className={styles.sectionTitle}>1. Objetivo da Pesquisa</h2>
           <p>
             Este questionário tem como finalidade coletar dados para o
-            desenvolvimento do VAP-App, um aplicativo projetado para apoiar
+            desenvolvimento e validação do VAP-App, uma ferramenta digital projetada para apoiar
             cuidadores de crianças com traqueostomia e outras necessidades
-            respiratórias complexas. Suas respostas nos ajudarão a entender
-            seus desafios, validar funcionalidades e criar uma ferramenta que
-            realmente faça a diferença.
+            respiratórias complexas. Suas respostas são essenciais para entendermos
+            seus desafios, validarmos funcionalidades e criarmos uma solução que
+            realmente agregue valor e segurança ao seu dia a dia.
           </p>
         </section>
 
         <section>
-          <h2 className={styles.sectionTitle}>2. Coleta e Uso dos Dados</h2>
+          <h2 className={styles.sectionTitle}>2. Coleta e Tratamento dos Dados</h2>
           <p>
-            Sua participação é totalmente voluntária. Para participar, é
-            necessário o preenchimento dos campos de nome e contato (e-mail ou
-            telefone). Esclarecemos como cada tipo de dado será utilizado:
+            Sua participação é voluntária e requer o fornecimento de nome e um meio de contato (e-mail ou
+            telefone), além das respostas ao questionário. Esclarecemos abaixo como seus dados serão tratados:
           </p>
           <ul className={styles.list}>
             <li>
-              <strong>Dados de Contato (Nome, e-mail/telefone):</strong> Estes
-              dados são coletados para o registro da sua participação e serão
-              armazenados de forma segura e separada das suas outras respostas.
-              Só utilizaremos esses dados para entrar em contato futuramente
-              caso você marque a opção que nos autoriza a fazê-lo.
+              <strong>Dados Identificáveis (Nome, contato, CEP, etc.):</strong> Serão
+              armazenados de forma segura e utilizados para o registro de sua participação.
+              Caso opte por permitir, poderemos usar seu contato para pesquisas futuras sobre o VAP-App.
             </li>
             <li>
-              <strong>Dados da Pesquisa (Suas Respostas):</strong> Todas as
-              suas respostas sobre experiências e opiniões serão analisadas de
-              forma anônima. Isso significa que, ao gerarmos nossos relatórios
-              e estudos, suas respostas serão agrupadas com as de outros
-              participantes e nunca serão associadas publicamente ao seu nome.
+              <strong>Dados da Pesquisa (Suas Respostas):</strong> Suas respostas ficarão
+              vinculadas aos seus dados de identificação em nossa base de dados. Isso nos permite realizar uma análise aprofundada e, se necessário, entender contextos específicos para o aprimoramento do aplicativo.
+            </li>
+            <li>
+              <strong>Uso em Relatórios e Publicações:</strong> Para fins de divulgação, relatórios e publicações acadêmicas, todos os dados serão tratados de forma agregada e <strong>anonimizada</strong>. A sua identidade individual jamais será exposta publicamente.
             </li>
           </ul>
         </section>
 
         <section>
-          <h2 className={styles.sectionTitle}>3. Confidencialidade e LGPD</h2>
+          <h2 className={styles.sectionTitle}>3. Confidencialidade e Segurança</h2>
           <p>
-            Garantimos a confidencialidade de todas as informações. Os dados
-            serão armazenados de forma segura e utilizados exclusivamente para
-            os fins desta pesquisa, em conformidade com a Lei Geral de Proteção
-            de Dados (LGPD - Lei nº 13.709/2018).
+            Garantimos o sigilo e a confidencialidade de todas as suas informações. O acesso aos dados brutos e identificáveis será restrito exclusivamente à equipe de pesquisa responsável pelo VAP-App. Todo o tratamento de dados está em estrita conformidade com a Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018).
           </p>
         </section>
 
         <section>
           <h2 className={styles.sectionTitle}>4. Direitos do Participante</h2>
           <ul className={styles.list}>
-            <li>
-              Suas respostas não têm certo ou errado; o que importa é a sua
-              vivência.
-            </li>
-            <li>
-              Para que a pesquisa seja válida, o preenchimento de todas as
-              perguntas é necessário. No entanto, você pode desistir de
-              participar e fechar o questionário a qualquer momento, sem
-              qualquer prejuízo.
-            </li>
+            <li>Você tem o direito de não responder a qualquer pergunta ou desistir de participar a qualquer momento, bastando fechar o formulário.</li>
+            <li>Não há respostas &ldquo;certas&rdquo; ou &ldquo;erradas&rdquo;. Valorizamos sua perspectiva e experiência sincera.</li>
+            <li>A participação ou não participação não acarretará qualquer penalidade ou perda de benefícios.</li>
           </ul>
         </section>
 
@@ -93,26 +80,24 @@ export default function TermosDePesquisaPage() {
           <p>
             Ao marcar a opção{" "}
             <strong>
-              &quot;Li e estou de acordo com os termos da pesquisa&quot;
+              &ldquo;Li e concordo com os termos da pesquisa&rdquo;
             </strong>{" "}
-            no início do questionário, você declara que:
+            no questionário, você declara que:
           </p>
           <ul className={styles.list}>
-            <li>Leu e compreendeu todas as informações deste termo.</li>
-            <li>Participa de forma livre e voluntária.</li>
+            <li>Leu, compreendeu e concorda com todas as informações deste termo.</li>
+            <li>Sua participação é livre e voluntária.</li>
             <li>
-              Está ciente de que suas respostas serão analisadas de forma
-              anônima e que seus dados de contato serão mantidos em sigilo.
+              Está ciente de que suas respostas serão analisadas de forma <strong>confidencial</strong>, mas não anônima, pela equipe de pesquisa, e que seus dados de contato serão mantidos em sigilo.
             </li>
           </ul>
         </section>
-
+        
         <section>
           <h2 className={styles.sectionTitle}>6. Agradecimento</h2>
           <p>
-            Sua colaboração é fundamental para construirmos uma ferramenta que
-            traga mais segurança, confiança e apoio para cuidadores e suas
-            famílias. Muito obrigado!
+            Sua colaboração é fundamental para a construção de uma ferramenta que
+            possa trazer mais segurança e apoio para inúmeras famílias. Agradecemos imensamente seu tempo e sua contribuição.
           </p>
         </section>
 
