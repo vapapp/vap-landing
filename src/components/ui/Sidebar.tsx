@@ -9,6 +9,7 @@ const navItems = [
   { href: "/admin/dashboard/demografia", label: "Demografia" },
   { href: "/admin/dashboard/funcionalidades", label: "Funcionalidades" },
   { href: "/admin/dashboard/comportamento", label: "Comportamento" },
+  { href: "/admin/dashboard/acesso", label: "Acesso e Advocacia" },
 ];
 
 interface SidebarProps {
