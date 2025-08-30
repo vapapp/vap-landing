@@ -2,8 +2,6 @@
  * Constantes para o formulário do questionário.
  */
 
-// A interface FormData foi movida para src/types/index.ts
-
 export const nivelEstudoOptions = [
   'Não estudei',
   'Ensino Fundamental incompleto',
@@ -26,6 +24,20 @@ export const maiorMedoOptions = [
   'Não conseguir contatar um médico ou serviço de emergência rapidamente.',
   'Tomar a decisão errada por conta própria.',
   'O equipamento (aspirador, ventilador) falhar.',
+];
+
+export const riscoGraveOptions = [
+    'Obstrução da cânula (entupimento por secreção)',
+    'Desconexão do ventilador ou oxigênio sem percepção',
+    'Saída acidental completa da cânula (decanulação)',
+    'Deslocamento da cânula (mal posicionamento)',
+    'Sangramento grave pela traqueostomia',
+    'Infecção respiratória grave e rápida',
+    'Aspiração de alimento ou objeto pela cânula',
+    'Falha de equipamento essencial (aspirador, ventilador)',
+    'Colapso do pulmão (pneumotórax) devido à ventilação',
+    'Emergência durante transporte (fora de casa)',
+    'Outro',
 ];
 
 export const sentimentoApoioOptions = [
@@ -126,6 +138,13 @@ export const utilidadeOutrasCondicoesOptions = [
   'Não, acho que não seria necessário.',
 ];
 
+export const apoioComunidadeOptions = [
+    'Muito interessado(a), seria uma grande ajuda',
+    'Interessado(a), mas gostaria de saber mais detalhes',
+    'Pouco interessado(a), prefiro outras formas de apoio',
+    'Não interessado(a), prefiro lidar sozinho(a)',
+];
+
 
 export const funcionalidadesOptions = [
   {
@@ -156,3 +175,4 @@ export const funcionalidadesOptions = [
 ];
 
 export const avaliacaoOptions = ['Inútil', 'Pouco Útil', 'Útil', 'Muito Útil', 'Essencial'];
+
