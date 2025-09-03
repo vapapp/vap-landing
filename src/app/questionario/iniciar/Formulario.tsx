@@ -90,6 +90,7 @@ export default function Formulario() {
     handleRadioChange,
     handleCheckboxChange,
     handleMultiCheckboxChange,
+    handleMultiCheckboxChangeRiscoGrave,
     handleCepChange,
     fetchAddressFromCEP,
     nextStep,
@@ -113,9 +114,7 @@ export default function Formulario() {
 
     const handler = ([entry]: IntersectionObserverEntry[]) => {
       const isSticky = !entry.isIntersecting;
-
       stepper.classList.toggle(styles.sticky, isSticky);
-
       placeholder.style.height = isSticky ? `${stepper.offsetHeight}px` : "0px";
     };
 
@@ -123,7 +122,6 @@ export default function Formulario() {
       threshold: 0,
       rootMargin: "0px",
     });
-
     observer.observe(trigger);
 
     return () => observer.disconnect();
@@ -131,10 +129,7 @@ export default function Formulario() {
 
   useEffect(() => {
     if (step > prevStepRef.current) {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
     prevStepRef.current = step;
   }, [step]);
@@ -391,20 +386,19 @@ export default function Formulario() {
       </div>
       <div className={styles.inputGroup}>
         <label>
-          Das situações de risco abaixo, qual mais te preocupa no dia a dia?
+          Das situações de risco abaixo, qual mais te preocupa no dia a dia? (Escolha até 3)
         </label>
         <p className={styles.questionSubtitle}>
-          Esta pergunta nos ajuda a entender as maiores emergências que
-          cuidadores enfrentam.
+          Esta pergunta nos ajuda a entender as maiores emergências que cuidadores enfrentam. 
         </p>
         <div className={styles.radioGroup}>
           {riscoGraveOptions.map((o) => (
-            <RadioOption
+            <CheckboxOption
               key={o}
               name="riscoGrave"
               value={o}
-              checked={formData.riscoGrave === o}
-              onChange={handleRadioChange}
+              checked={formData.riscoGrave?.includes(o) || false}
+              onChange={handleMultiCheckboxChangeRiscoGrave}
             />
           ))}
         </div>
@@ -663,7 +657,6 @@ export default function Formulario() {
   );
 
   const renderCuidadosGeraisStep = () => (
-    // Para quem respondeu NÃO TQT
     <div className={styles.formStep}>
       <h2>Cuidados Respiratórios</h2>
       <p className={styles.sectionDescription}>
@@ -711,7 +704,6 @@ export default function Formulario() {
   );
 
   const renderExperienciaNaoTQTStep = () => (
-   
     <div className={styles.formStep}>
       <h2>Sua Experiência Hospitalar</h2>
       <p className={styles.sectionDescription}>
@@ -719,6 +711,28 @@ export default function Formulario() {
         sua experiência durante períodos de internação.
       </p>
       {renderIntubacaoQuestions()}
+    </div>
+  );
+
+  const renderSugestoesStep = () => (
+    <div className={styles.formStep}>
+      <h2>Sua Voz é Importante</h2>
+      <p className={styles.sectionDescription}>
+        Se você tem alguma sugestão, crítica ou algo que considera essencial e não foi perguntado, este é o espaço. Sua opinião nos ajuda a não deixar nada importante de fora. (Opcional)
+      </p>
+      <div className={styles.inputGroup}>
+        <textarea
+          name="sugestaoFinal"
+          value={formData.sugestaoFinal || ""}
+          onChange={handleInputChange}
+          placeholder="Digite sua mensagem aqui..."
+          maxLength={200}
+          className={styles.textarea}
+        />
+        <div className={styles.charCounter}>
+          {(formData.sugestaoFinal?.length || 0)}/200
+        </div>
+      </div>
     </div>
   );
 
@@ -736,33 +750,22 @@ export default function Formulario() {
     switch (formData.usaTraqueostomia) {
       case "Sim":
         switch (step) {
-          case 0:
-            return renderPerfilStep();
-          case 1:
-            return renderDesafiosStep();
-          case 2:
-            return renderComunidadeStep();
-          case 3:
-            return renderSolucaoStep();
-          case 4:
-            return renderExperienciaSimTQTStep();
-          case 5:
-            return renderFinalizacaoStep();
-          default:
-            return null;
+          case 0: return renderPerfilStep();
+          case 1: return renderDesafiosStep();
+          case 2: return renderComunidadeStep();
+          case 3: return renderSolucaoStep();
+          case 4: return renderExperienciaSimTQTStep();
+          case 5: return renderSugestoesStep();
+          case 6: return renderFinalizacaoStep();
+          default: return null;
         }
       case "Não":
         switch (step) {
-          case 0:
-            return renderPerfilStep();
-          case 1:
-            return renderCuidadosGeraisStep();
-          case 2:
-            return renderExperienciaNaoTQTStep();
-          case 3:
-            return renderFinalizacaoStep();
-          default:
-            return null;
+          case 0: return renderPerfilStep();
+          case 1: return renderCuidadosGeraisStep();
+          case 2: return renderExperienciaNaoTQTStep();
+          case 3: return renderFinalizacaoStep();
+          default: return null;
         }
       default:
         return renderPerfilStep();

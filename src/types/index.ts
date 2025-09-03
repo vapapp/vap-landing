@@ -19,7 +19,7 @@ export interface FormData {
   aceitouContatoFuturo?: boolean;
   parentesco?: string;
   maiorMedo?: string;
-  riscoGrave?: string;
+  riscoGrave?: string[];
   sentimentoApoio?: string;
   confiancaCuidado?: string;
   buscaInformacao?: string;
@@ -36,6 +36,7 @@ export interface FormData {
   pensouComprarDispositivo?: string;
   dificuldadeCompra?: string;
   apoioComunidade?: string;
+  sugestaoFinal?: string; 
 }
 
 /**

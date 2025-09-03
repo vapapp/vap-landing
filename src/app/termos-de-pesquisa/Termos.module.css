@@ -42,24 +42,22 @@
   margin-bottom: 10px;
 }
 
-.list {
+.list, .alphaList {
   padding-left: 20px;
   margin-top: 10px;
+  color: #4a5568;
 }
 
-.list li {
+.list li, .alphaList li {
   font-size: 1rem;
-  color: #4a5568;
   line-height: 1.7;
   margin-bottom: 8px;
 }
 
-.consentCheck {
-  background-color: #f7fafc;
-  border: 1px solid #e2e8f0;
-  padding: 15px;
-  border-radius: 8px;
+.alphaList {
+  list-style-type: lower-alpha;
 }
+
 
 .buttonContainer {
   margin-top: 40px;

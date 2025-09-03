@@ -15,6 +15,7 @@ export const useQuestionarioForm = () => {
     aceitouTermosPesquisa: false,
     aceitouContatoFuturo: false,
     momentoUsoApp: [],
+    riscoGrave: [],
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +25,7 @@ export const useQuestionarioForm = () => {
     setError(null);
   }, []);
 
-  // Mantendo os nomes originais das seções
+
   const stepsConfig = useMemo(() => {
     if (formData.usaTraqueostomia === 'Não') {
       return [
@@ -34,13 +35,14 @@ export const useQuestionarioForm = () => {
         { name: 'Finalização' },
       ];
     }
-    // Fluxo para "Sim"
+    // Fluxo para "Sim" com a seção de sugestões renomeada
     return [
       { name: 'Seção 1' },
       { name: 'Seção 2' },
       { name: 'Seção 3' },
       { name: 'Seção 4' },
       { name: 'Seção 5' },
+      { name: 'Seção 6' }, 
       { name: 'Finalização' },
     ];
   }, [formData.usaTraqueostomia]);
@@ -60,7 +62,7 @@ export const useQuestionarioForm = () => {
     const { name, checked } = e.target;
     setFormData(prev => ({ ...prev, [name]: checked }));
   }, []);
-  
+
   const handleMultiCheckboxChange = useCallback((name: keyof FormData, value: string) => {
     setFormData(prev => {
         const currentValues = (prev[name] as string[] | undefined) || [];
@@ -68,14 +70,30 @@ export const useQuestionarioForm = () => {
             ? currentValues.filter(v => v !== value)
             : [...currentValues, value];
 
-        if (newValues.length > 2) {
+        if (name === 'momentoUsoApp' && newValues.length > 2) {
             setError("Você pode selecionar no máximo 2 opções.");
             return prev;
         }
         clearError();
         return { ...prev, [name]: newValues };
     });
-}, [clearError]);
+  }, [clearError]);
+
+  const handleMultiCheckboxChangeRiscoGrave = useCallback((name: keyof FormData, value: string) => {
+      setFormData(prev => {
+          const currentValues = (prev[name] as string[] | undefined) || [];
+          const newValues = currentValues.includes(value)
+              ? currentValues.filter(v => v !== value)
+              : [...currentValues, value];
+
+          if (newValues.length > 3) {
+              setError("Você pode selecionar no máximo 3 opções.");
+              return prev;
+          }
+          clearError();
+          return { ...prev, [name]: newValues };
+      });
+  }, [clearError]);
 
 
   const fetchAddressFromCEP = useCallback(async (cep: string) => {
@@ -182,15 +200,11 @@ export const useQuestionarioForm = () => {
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    if(!validateStep(step)){
-        return;
-    }
     setError(null);
     setIsLoading(true);
 
     try {
       await fetchAddressFromCEP(formData.cep || '');
-      // Aguarda um pequeno tempo para garantir que o estado seja atualizado com o endereço
       await new Promise(resolve => setTimeout(resolve, 500)); 
 
       setFormData(currentData => {
@@ -214,7 +228,7 @@ export const useQuestionarioForm = () => {
       setError("Ocorreu um erro ao processar o CEP. Tente novamente.");
       setIsLoading(false);
     }
-  }, [formData.cep, step, validateStep, fetchAddressFromCEP]);
+  }, [formData.cep, fetchAddressFromCEP]);
 
   return {
     step,
@@ -228,6 +242,7 @@ export const useQuestionarioForm = () => {
     handleRadioChange,
     handleCheckboxChange,
     handleMultiCheckboxChange,
+    handleMultiCheckboxChangeRiscoGrave,
     handleCepChange,
     fetchAddressFromCEP,
     nextStep,
