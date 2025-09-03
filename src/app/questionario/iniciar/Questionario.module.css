@@ -182,7 +182,8 @@
 }
 
 .inputGroup input[type="text"],
-.inputGroup input[type="email"] {
+.inputGroup input[type="email"],
+.textarea {
   width: 100%;
   padding: 12px 15px;
   border: 1px solid #ccc;
@@ -191,13 +192,27 @@
   background-color: #ffffff;
   color: #1a202c;
   transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
 }
 
 .inputGroup input[type="text"]:focus,
-.inputGroup input[type="email"]:focus {
+.inputGroup input[type="email"]:focus,
+.textarea:focus {
   outline: none;
   border-color: #00949D;
   box-shadow: 0 0 0 3px rgba(0, 148, 157, 0.2);
+}
+
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.charCounter {
+  text-align: right;
+  font-size: 0.85rem;
+  color: #718096;
+  margin-top: 8px;
 }
 
 .radioGroup {
@@ -487,13 +502,14 @@
     text-align: center;
   }
   .tableRadios label {
-    flex-direction: column-reverse; 
+    flex-direction: column; 
     font-size: 0.7rem;
     color: #555;
     gap: 5px;
   }
+  
   .tableRadios .tableRadioLabel {
-    display: none;
+    display: block;
   }
   .tableRadios input {
       margin: 0;
