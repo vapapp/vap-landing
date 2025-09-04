@@ -1,8 +1,8 @@
 import { useState, useMemo, useCallback } from 'react';
-import { db } from '../lib/firebase';
+import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import type { FormData } from '../types';
-import { funcionalidadesOptions } from '../app/questionario/iniciar/constants';
+import type { FormData } from '@/types';
+import { funcionalidadesOptions } from '@/app/questionario/iniciar/constants';
 
 /**
  * Hook customizado para gerenciar a lógica do formulário de questionário.
@@ -21,9 +21,11 @@ export const useQuestionarioForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [validationErrorField, setValidationErrorField] = useState<keyof FormData | null>(null);
 
   const clearError = useCallback(() => {
     setError(null);
+    setValidationErrorField(null);
   }, []);
 
   const stepsConfig = useMemo(() => {
@@ -50,18 +52,20 @@ export const useQuestionarioForm = () => {
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setValidationErrorField(null);
+    setFormData((prev: FormData) => ({ ...prev, [name]: value }));
   }, []);
 
   const handleRadioChange = useCallback((name: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setValidationErrorField(null);
+    setFormData((prev: FormData) => ({ ...prev, [name]: value }));
   }, []);
 
   const handleCheckboxChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
-    
+    setValidationErrorField(null);
     if (name === 'naoTemCep') {
-        setFormData(prev => ({
+        setFormData((prev: FormData) => ({
             ...prev,
             [name]: checked,
             cep: '',
@@ -72,12 +76,13 @@ export const useQuestionarioForm = () => {
         }));
         clearError();
     } else {
-        setFormData(prev => ({ ...prev, [name]: checked }));
+        setFormData((prev: FormData) => ({ ...prev, [name]: checked }));
     }
   }, [clearError]);
 
   const handleMultiCheckboxChange = useCallback((name: keyof FormData, value: string) => {
-    setFormData(prev => {
+    setValidationErrorField(null);
+    setFormData((prev: FormData) => {
         const currentValues = (prev[name] as string[] | undefined) || [];
         const newValues = currentValues.includes(value)
             ? currentValues.filter(v => v !== value)
@@ -93,7 +98,8 @@ export const useQuestionarioForm = () => {
   }, [clearError]);
 
   const handleMultiCheckboxChangeRiscoGrave = useCallback((name: keyof FormData, value: string) => {
-      setFormData(prev => {
+      setValidationErrorField(null);
+      setFormData((prev: FormData) => {
           const currentValues = (prev[name] as string[] | undefined) || [];
           const newValues = currentValues.includes(value)
               ? currentValues.filter(v => v !== value)
@@ -117,11 +123,12 @@ export const useQuestionarioForm = () => {
       if (!response.ok) throw new Error('CEP não encontrado');
       const data = await response.json();
       if (data.erro) {
-        setError("CEP não encontrado. Verifique o número ou marque a opção 'Não tenho CEP' para preencher manualmente.");
+        setError("CEP não encontrado. Verifique o número ou marque a opção 'Não tenho CEP' para preencher manually.");
+        setValidationErrorField('cep');
         setIsLoading(false);
         return false;
       }
-      setFormData(prev => ({
+      setFormData((prev: FormData) => ({
         ...prev,
         rua: data.logradouro,
         bairro: data.bairro,
@@ -134,6 +141,7 @@ export const useQuestionarioForm = () => {
     } catch (err) {
       console.error("Erro ao buscar CEP:", err);
       setError("Não foi possível buscar o endereço. Verifique sua conexão ou o CEP digitado.");
+      setValidationErrorField('cep');
       setIsLoading(false);
       return false;
     }
@@ -143,7 +151,7 @@ export const useQuestionarioForm = () => {
     let value = e.target.value;
     value = value.replace(/\D/g, '');
     value = value.replace(/^(\d{5})(\d)/, '$1-$2');
-    setFormData(prev => ({ ...prev, cep: value.slice(0, 9) }));
+    setFormData((prev: FormData) => ({ ...prev, cep: value.slice(0, 9) }));
     if(value.length < 9) {
         clearError();
     }
@@ -159,40 +167,39 @@ export const useQuestionarioForm = () => {
         return !value;
     };
 
+    const handleValidationError = (field: keyof FormData, message: string = missingFieldMessage) => {
+        setError(message);
+        setValidationErrorField(field);
+        return false;
+    };
+
     const fieldsByStepSim: (keyof FormData)[][] = [
-        [],
+        [], // Step 0 is handled separately
         ['parentesco', 'maiorMedo', 'riscoGrave', 'sentimentoApoio', 'confiancaCuidado', 'buscaInformacao', 'filhoIntubado'],
         ['apoioComunidade'],
-        [...funcionalidadesOptions.map(f => `func_${f.id}` as keyof FormData), 'momentoUsoApp', 'importanciaApp', 'maiorBeneficio'],
+        [...funcionalidadesOptions.map((f: {id: string}) => `func_${f.id}` as keyof FormData), 'momentoUsoApp', 'importanciaApp', 'maiorBeneficio'],
         ['importanciaVozFamilias', 'pensouComprarDispositivo']
     ];
     
     const fieldsByStepNao: (keyof FormData)[][] = [
-        [],
+        [], // Step 0 is handled separately
         ['cuidaOutraCondicao', 'utilidadeOutrasCondicoes'],
         ['filhoIntubado']
     ];
 
     if(currentStep === 0) {
-        const baseFields: (keyof FormData)[] = ['nome', 'contato', 'nivelEstudo', 'usaTraqueostomia', 'aceitouTermosPesquisa'];
-        let locationFields: (keyof FormData)[] = [];
-
+        const baseFields: (keyof FormData)[] = ['nome', 'contato', 'nivelEstudo', 'usaTraqueostomia'];
         if (formData.naoTemCep) {
-            locationFields = ['rua', 'bairro', 'cidade', 'estado'];
+            baseFields.push('rua', 'bairro', 'cidade', 'estado');
         } else {
-            locationFields = ['cep', 'rua', 'bairro', 'cidade', 'estado'];
+            baseFields.push('cep');
         }
 
-        const fieldsToValidate = [...baseFields, ...locationFields];
-        for (const field of fieldsToValidate) {
-            if (isFieldMissing(field)) {
-                 if (field === 'rua' && !formData.naoTemCep && formData.cep && formData.cep.length === 9) {
-                    setError("CEP não encontrado. Verifique o número ou marque a opção para preencher manualmente.");
-                    return false;
-                }
-                setError(missingFieldMessage);
-                return false;
-            }
+        for (const field of baseFields) {
+            if (isFieldMissing(field)) return handleValidationError(field);
+        }
+        if (!formData.aceitouTermosPesquisa) {
+            return handleValidationError('aceitouTermosPesquisa', "Você precisa aceitar os termos da pesquisa para continuar.");
         }
     } else {
         let fieldsToValidate: (keyof FormData)[] = [];
@@ -212,10 +219,7 @@ export const useQuestionarioForm = () => {
         }
         
         for (const field of fieldsToValidate) {
-            if (isFieldMissing(field)) {
-                setError(missingFieldMessage);
-                return false;
-            }
+            if (isFieldMissing(field)) return handleValidationError(field);
         }
     }
 
@@ -224,22 +228,20 @@ export const useQuestionarioForm = () => {
 
   const nextStep = useCallback(async () => {
     clearError();
-    if (step === 0 && !formData.naoTemCep) {
-        const cep = formData.cep || '';
-        if (cep.length === 9) {
-            await fetchAddressFromCEP(cep);
-        }
+    let isCepValid = true;
+    if (step === 0 && !formData.naoTemCep && formData.cep?.length === 9) {
+        isCepValid = await fetchAddressFromCEP(formData.cep);
     }
 
-    if (validateStep(step)) {
-      setStep(prev => Math.min(prev + 1, totalSteps - 1));
+    if (isCepValid && validateStep(step)) {
+      setStep((prev: number) => Math.min(prev + 1, totalSteps - 1));
     }
   }, [step, totalSteps, validateStep, formData.cep, formData.naoTemCep, fetchAddressFromCEP, clearError]);
 
   const prevStep = useCallback(() => {
-    setError(null);
-    setStep(prev => Math.max(prev - 1, 0));
-  }, []);
+    clearError();
+    setStep((prev: number) => Math.max(prev - 1, 0));
+  }, [clearError]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -278,13 +280,13 @@ export const useQuestionarioForm = () => {
     isSubmitted,
     stepsConfig,
     totalSteps,
+    validationErrorField,
     handleInputChange,
     handleRadioChange,
     handleCheckboxChange,
     handleMultiCheckboxChange,
     handleMultiCheckboxChangeRiscoGrave,
     handleCepChange,
-    fetchAddressFromCEP,
     nextStep,
     prevStep,
     handleSubmit,

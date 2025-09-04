@@ -86,13 +86,13 @@ export default function Formulario() {
     isSubmitted,
     stepsConfig,
     totalSteps,
+    validationErrorField,
     handleInputChange,
     handleRadioChange,
     handleCheckboxChange,
     handleMultiCheckboxChange,
     handleMultiCheckboxChangeRiscoGrave,
     handleCepChange,
-    fetchAddressFromCEP,
     nextStep,
     prevStep,
     handleSubmit,
@@ -102,7 +102,6 @@ export default function Formulario() {
   const stepperWrapperRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
   const stickyPlaceholderRef = useRef<HTMLDivElement>(null);
-
   const prevStepRef = useRef(step);
 
   useEffect(() => {
@@ -133,6 +132,15 @@ export default function Formulario() {
     }
     prevStepRef.current = step;
   }, [step]);
+  
+  useEffect(() => {
+    if (validationErrorField) {
+      const errorElement = document.querySelector(`[data-field-group="${validationErrorField}"]`);
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [validationErrorField]);
 
   if (isSubmitted) {
     return (
@@ -170,8 +178,8 @@ export default function Formulario() {
         Primeiro, algumas perguntas rápidas para entendermos seu perfil. Todas
         as perguntas são obrigatórias, exceto quando indicado.
       </p>
-      <div className={styles.inputGroup}>
-        <label>1. Nome do Responsavel</label>
+      <div data-field-group="nome" className={`${styles.inputGroup} ${validationErrorField === 'nome' ? styles.errorField : ''}`}>
+        <label>1. Nome do responsável</label>
         <input
           type="text"
           name="nome"
@@ -181,7 +189,7 @@ export default function Formulario() {
           required
         />
       </div>
-      <div className={styles.inputGroup}>
+      <div data-field-group="contato" className={`${styles.inputGroup} ${validationErrorField === 'contato' ? styles.errorField : ''}`}>
         <label>2. E-mail ou Telefone</label>
         <input
           type="text"
@@ -196,23 +204,24 @@ export default function Formulario() {
       <hr className={styles.sectionDivider} />
       <h3>Endereço</h3>
 
-      {!formData.naoTemCep && (
-        <div className={styles.inputGroup}>
-          <label>3. CEP</label>
-          <input
-            type="text"
-            name="cep"
-            value={formData.cep || ""}
-            onChange={handleCepChange}
-            onBlur={(e) => fetchAddressFromCEP(e.target.value)}
-            placeholder="00000-000"
-            maxLength={9}
-            required
-          />
-        </div>
-      )}
+      <div data-field-group="cep" className={`${styles.inputGroup} ${validationErrorField === 'cep' ? styles.errorField : ''}`}>
+        {!formData.naoTemCep && (
+            <div >
+            <label>3. CEP</label>
+            <input
+                type="text"
+                name="cep"
+                value={formData.cep || ""}
+                onChange={handleCepChange}
+                placeholder="00000-000"
+                maxLength={9}
+                required
+            />
+            </div>
+        )}
+      </div>
 
-      <div className={styles.consentGroup} style={{ marginTop: !formData.naoTemCep ? '-15px' : '0', marginBottom: '25px' }}>
+      <div data-field-group="naoTemCep" className={`${styles.consentGroup} ${validationErrorField === 'naoTemCep' ? styles.errorField : ''}`} style={{ marginTop: !formData.naoTemCep ? '-15px' : '0', marginBottom: '25px' }}>
         <label className={styles.consentLabel}>
           <input
             type="checkbox"
@@ -227,7 +236,7 @@ export default function Formulario() {
 
       {formData.naoTemCep && (
         <>
-          <div className={styles.inputGroup}>
+          <div data-field-group="rua" className={`${styles.inputGroup} ${validationErrorField === 'rua' ? styles.errorField : ''}`}>
             <label>Rua</label>
             <input
               type="text"
@@ -238,7 +247,7 @@ export default function Formulario() {
               required
             />
           </div>
-          <div className={styles.inputGroup}>
+          <div data-field-group="bairro" className={`${styles.inputGroup} ${validationErrorField === 'bairro' ? styles.errorField : ''}`}>
             <label>Bairro</label>
             <input
               type="text"
@@ -249,7 +258,7 @@ export default function Formulario() {
               required
             />
           </div>
-          <div className={styles.inputGroup}>
+          <div data-field-group="cidade" className={`${styles.inputGroup} ${validationErrorField === 'cidade' ? styles.errorField : ''}`}>
             <label>Cidade</label>
             <input
               type="text"
@@ -260,7 +269,7 @@ export default function Formulario() {
               required
             />
           </div>
-          <div className={styles.inputGroup}>
+          <div data-field-group="estado" className={`${styles.inputGroup} ${validationErrorField === 'estado' ? styles.errorField : ''}`}>
             <label>Estado</label>
             <input
               type="text"
@@ -277,7 +286,7 @@ export default function Formulario() {
 
       <hr className={styles.sectionDivider} />
 
-      <div className={styles.inputGroup}>
+      <div data-field-group="nivelEstudo" className={`${styles.inputGroup} ${validationErrorField === 'nivelEstudo' ? styles.errorField : ''}`}>
         <label>4. Qual seu nível de estudo?</label>
         <div className={styles.radioGroup}>
           {nivelEstudoOptions.map((o) => (
@@ -291,7 +300,7 @@ export default function Formulario() {
           ))}
         </div>
       </div>
-      <div className={styles.inputGroup}>
+      <div data-field-group="usaTraqueostomia" className={`${styles.inputGroup} ${validationErrorField === 'usaTraqueostomia' ? styles.errorField : ''}`}>
         <label>5. A criança que você cuida utiliza traqueostomia?</label>
         <div className={styles.radioGroup}>
           <RadioOption
@@ -309,7 +318,7 @@ export default function Formulario() {
         </div>
       </div>
 
-      <div className={styles.consentGroup}>
+      <div data-field-group="aceitouTermosPesquisa" className={`${styles.consentGroup} ${validationErrorField === 'aceitouTermosPesquisa' ? styles.errorField : ''}`}>
         <label className={styles.consentLabel}>
           <input
             type="checkbox"
@@ -351,7 +360,7 @@ export default function Formulario() {
 
   const renderIntubacaoQuestions = () => (
     <>
-      <div className={styles.inputGroup}>
+      <div data-field-group="filhoIntubado" className={`${styles.inputGroup} ${validationErrorField === 'filhoIntubado' ? styles.errorField : ''}`}>
         <label>Seu filho já foi intubado?</label>
         <div className={styles.radioGroup}>
           {filhoIntubadoOptions.map((o) => (
@@ -367,7 +376,7 @@ export default function Formulario() {
       </div>
       {formData.filhoIntubado && !formData.filhoIntubado.startsWith("Não") && (
         <>
-          <div className={styles.inputGroup}>
+          <div data-field-group="sabiaRiscosIntubacao" className={`${styles.inputGroup} ${validationErrorField === 'sabiaRiscosIntubacao' ? styles.errorField : ''}`}>
             <label>
               Antes da intubação, você sabia que existiam riscos para a criança?
             </label>
@@ -383,7 +392,7 @@ export default function Formulario() {
               ))}
             </div>
           </div>
-          <div className={styles.inputGroup}>
+          <div data-field-group="explicaramRiscosTQT" className={`${styles.inputGroup} ${validationErrorField === 'explicaramRiscosTQT' ? styles.errorField : ''}`}>
             <label>
               Durante a internação, alguém explicou para você os riscos da
               traqueostomia?
@@ -400,7 +409,7 @@ export default function Formulario() {
               ))}
             </div>
           </div>
-          <div className={styles.inputGroup}>
+          <div data-field-group="medoIntubacao" className={`${styles.inputGroup} ${validationErrorField === 'medoIntubacao' ? styles.errorField : ''}`}>
             <label>
               Qual foi o seu principal medo ao ver seu filho intubado?
             </label>
@@ -428,7 +437,7 @@ export default function Formulario() {
         Queremos entender quem são os cuidadores e os desafios que enfrentam no
         dia a dia.
       </p>
-      <div className={styles.inputGroup}>
+      <div data-field-group="parentesco" className={`${styles.inputGroup} ${validationErrorField === 'parentesco' ? styles.errorField : ''}`}>
         <label>Qual seu principal parentesco com a criança?</label>
         <div className={styles.radioGroup}>
           {parentescoOptions.map((o) => (
@@ -442,7 +451,7 @@ export default function Formulario() {
           ))}
         </div>
       </div>
-      <div className={styles.inputGroup}>
+      <div data-field-group="maiorMedo" className={`${styles.inputGroup} ${validationErrorField === 'maiorMedo' ? styles.errorField : ''}`}>
         <label>Pensando em momentos de crise, qual é o seu maior medo?</label>
         <div className={styles.radioGroup}>
           {maiorMedoOptions.map((o) => (
@@ -456,7 +465,7 @@ export default function Formulario() {
           ))}
         </div>
       </div>
-      <div className={styles.inputGroup}>
+      <div data-field-group="riscoGrave" className={`${styles.inputGroup} ${validationErrorField === 'riscoGrave' ? styles.errorField : ''}`}>
         <label>
           Das situações de risco abaixo, qual mais te preocupa no dia a dia? (Escolha até 3)
         </label>
@@ -475,7 +484,7 @@ export default function Formulario() {
           ))}
         </div>
       </div>
-      <div className={styles.inputGroup}>
+      <div data-field-group="sentimentoApoio" className={`${styles.inputGroup} ${validationErrorField === 'sentimentoApoio' ? styles.errorField : ''}`}>
         <label>Com que frequência você se sente sozinho(a) e sem apoio?</label>
         <div className={styles.radioGroup}>
           {sentimentoApoioOptions.map((o) => (
@@ -489,7 +498,7 @@ export default function Formulario() {
           ))}
         </div>
       </div>
-      <div className={styles.inputGroup}>
+      <div data-field-group="confiancaCuidado" className={`${styles.inputGroup} ${validationErrorField === 'confiancaCuidado' ? styles.errorField : ''}`}>
         <label>
           Como você avalia sua confiança hoje no cuidado da traqueostomia?
         </label>
@@ -505,7 +514,7 @@ export default function Formulario() {
           ))}
         </div>
       </div>
-      <div className={styles.inputGroup}>
+      <div data-field-group="buscaInformacao" className={`${styles.inputGroup} ${validationErrorField === 'buscaInformacao' ? styles.errorField : ''}`}>
         <label>
           Quando tem uma dúvida, onde você busca informação primeiro?
         </label>
@@ -533,7 +542,7 @@ export default function Formulario() {
       <p className={styles.sectionDescription}>
         Sua opinião sobre a criação de um espaço de troca é muito importante.
       </p>
-      <div className={styles.inputGroup}>
+      <div data-field-group="apoioComunidade" className={`${styles.inputGroup} ${validationErrorField === 'apoioComunidade' ? styles.errorField : ''}`}>
         <label>
           Considerando os desafios que você enfrenta no cuidado diário, você se
           sentiria mais apoiado(a) fazendo parte de uma comunidade segura e
@@ -572,44 +581,46 @@ export default function Formulario() {
       </p>
       <div className={styles.inputGroup}>
         <label>Avalie a importância de cada funcionalidade:</label>
-        <div className={styles.table}>
-          <div className={styles.tableHeader}>
-            <div className={styles.tableHeaderFunc}>Funcionalidade</div>
-            <div className={styles.tableHeaderOptions}>
-              {avaliacaoOptions.map((level) => (
-                <span key={level}>{level}</span>
-              ))}
-            </div>
-          </div>
-          {funcionalidadesOptions.map((func) => (
-            <div key={func.id} className={styles.tableRow}>
-              <div className={styles.tableLabel}>
-                <div>{func.label}</div>
-                <div className={styles.tableDescription}>
-                  {func.description}
+        {funcionalidadesOptions.map((func) => (
+            <div key={func.id} data-field-group={`func_${func.id}`} className={validationErrorField === `func_${func.id}` ? styles.errorField : ''}>
+                <div className={styles.table}>
+                <div className={styles.tableHeader}>
+                    <div className={styles.tableHeaderFunc}>Funcionalidade</div>
+                    <div className={styles.tableHeaderOptions}>
+                    {avaliacaoOptions.map((level) => (
+                        <span key={level}>{level}</span>
+                    ))}
+                    </div>
                 </div>
-              </div>
-              <div className={styles.tableRadios}>
-                {avaliacaoOptions.map((level) => (
-                  <label key={level} title={level}>
-                    <input
-                      type="radio"
-                      name={`func_${func.id}`}
-                      value={level}
-                      checked={formData[`func_${func.id}`] === level}
-                      onChange={() =>
-                        handleRadioChange(`func_${func.id}`, level)
-                      }
-                    />
-                    <span className={styles.tableRadioLabel}>{level}</span>
-                  </label>
-                ))}
-              </div>
+                <div className={styles.tableRow}>
+                    <div className={styles.tableLabel}>
+                    <div>{func.label}</div>
+                    <div className={styles.tableDescription}>
+                        {func.description}
+                    </div>
+                    </div>
+                    <div className={styles.tableRadios}>
+                    {avaliacaoOptions.map((level) => (
+                        <label key={level} title={level}>
+                        <input
+                            type="radio"
+                            name={`func_${func.id}`}
+                            value={level}
+                            checked={formData[`func_${func.id}`] === level}
+                            onChange={() =>
+                            handleRadioChange(`func_${func.id}`, level)
+                            }
+                        />
+                        <span className={styles.tableRadioLabel}>{level}</span>
+                        </label>
+                    ))}
+                    </div>
+                </div>
+                </div>
             </div>
-          ))}
-        </div>
+        ))}
       </div>
-      <div className={styles.inputGroup}>
+      <div data-field-group="momentoUsoApp" className={`${styles.inputGroup} ${validationErrorField === 'momentoUsoApp' ? styles.errorField : ''}`}>
         <label>
           Em qual destes momentos você acredita que MAIS usaria o VAP-App?
           (Selecione até 2 opções)
@@ -626,7 +637,7 @@ export default function Formulario() {
           ))}
         </div>
       </div>
-      <div className={styles.inputGroup}>
+      <div data-field-group="importanciaApp" className={`${styles.inputGroup} ${validationErrorField === 'importanciaApp' ? styles.errorField : ''}`}>
         <label>
           O que seria mais importante para você em um aplicativo como este?
         </label>
@@ -642,7 +653,7 @@ export default function Formulario() {
           ))}
         </div>
       </div>
-      <div className={styles.inputGroup}>
+      <div data-field-group="maiorBeneficio" className={`${styles.inputGroup} ${validationErrorField === 'maiorBeneficio' ? styles.errorField : ''}`}>
         <label>
           Qual seria o maior benefício que um aplicativo como o VAP-App poderia
           trazer para a sua vida?
@@ -669,7 +680,7 @@ export default function Formulario() {
         Sua perspectiva sobre o acesso a materiais e a importância da comunidade
         é fundamental para nós.
       </p>
-      <div className={styles.inputGroup}>
+      <div data-field-group="importanciaVozFamilias" className={`${styles.inputGroup} ${validationErrorField === 'importanciaVozFamilias' ? styles.errorField : ''}`}>
         <label>
           Você acha importante que a voz das famílias seja ouvida para criar
           políticas públicas de cuidado?
@@ -686,7 +697,7 @@ export default function Formulario() {
           ))}
         </div>
       </div>
-      <div className={styles.inputGroup}>
+      <div data-field-group="pensouComprarDispositivo" className={`${styles.inputGroup} ${validationErrorField === 'pensouComprarDispositivo' ? styles.errorField : ''}`}>
         <label>
           Já pensou em comprar algum dispositivo de via aérea, mas não soube
           como?
@@ -708,7 +719,7 @@ export default function Formulario() {
         formData.pensouComprarDispositivo !== "Não, nunca precisei" &&
         formData.pensouComprarDispositivo !==
           "Não sabia que era possível comprar por conta própria" && (
-          <div className={styles.inputGroup}>
+          <div data-field-group="dificuldadeCompra" className={`${styles.inputGroup} ${validationErrorField === 'dificuldadeCompra' ? styles.errorField : ''}`}>
             <label>
               Se já pensou em comprar, qual foi a maior dificuldade?
             </label>
@@ -735,7 +746,7 @@ export default function Formulario() {
         Agora, algumas perguntas sobre o cenário de cuidados respiratórios que
         você vivencia.
       </p>
-      <div className={styles.inputGroup}>
+      <div data-field-group="cuidaOutraCondicao" className={`${styles.inputGroup} ${validationErrorField === 'cuidaOutraCondicao' ? styles.errorField : ''}`}>
         <label>
           Você cuida de alguma criança que precise de cuidados respiratórios
           complexos (oxigênio, aspirador), mesmo sem traqueostomia?
@@ -755,7 +766,7 @@ export default function Formulario() {
           />
         </div>
       </div>
-      <div className={styles.inputGroup}>
+      <div data-field-group="utilidadeOutrasCondicoes" className={`${styles.inputGroup} ${validationErrorField === 'utilidadeOutrasCondicoes' ? styles.errorField : ''}`}>
         <label>
           Você acredita que um app com guias de saúde e organização seria útil
           para cuidadores de crianças com outras condições complexas?
@@ -897,7 +908,7 @@ export default function Formulario() {
               (step === 0 && !formData.aceitouTermosPesquisa)
             }
           >
-            {isLoading && step === 0 ? 'Validando CEP...' : 'Próximo'}
+            {isLoading && step === 0 ? 'Validando...' : 'Próximo'}
           </button>
         ) : (
           <button
