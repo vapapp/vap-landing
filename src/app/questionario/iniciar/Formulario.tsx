@@ -171,7 +171,7 @@ export default function Formulario() {
         as perguntas são obrigatórias, exceto quando indicado.
       </p>
       <div className={styles.inputGroup}>
-        <label>1. Nome</label>
+        <label>1. Nome do Responsavel</label>
         <input
           type="text"
           name="nome"
