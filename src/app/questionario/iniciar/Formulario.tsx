@@ -168,7 +168,7 @@ export default function Formulario() {
       <h2>Seu Perfil</h2>
       <p className={styles.sectionDescription}>
         Primeiro, algumas perguntas rápidas para entendermos seu perfil. Todas
-        as perguntas são obrigatórias.
+        as perguntas são obrigatórias, exceto quando indicado.
       </p>
       <div className={styles.inputGroup}>
         <label>1. Nome</label>
@@ -192,19 +192,91 @@ export default function Formulario() {
           required
         />
       </div>
-      <div className={styles.inputGroup}>
-        <label>3. CEP</label>
-        <input
-          type="text"
-          name="cep"
-          value={formData.cep || ""}
-          onChange={handleCepChange}
-          onBlur={(e) => fetchAddressFromCEP(e.target.value)}
-          placeholder="00000-000"
-          maxLength={9}
-          required
-        />
+
+      <hr className={styles.sectionDivider} />
+      <h3>Endereço</h3>
+
+      {!formData.naoTemCep && (
+        <div className={styles.inputGroup}>
+          <label>3. CEP</label>
+          <input
+            type="text"
+            name="cep"
+            value={formData.cep || ""}
+            onChange={handleCepChange}
+            onBlur={(e) => fetchAddressFromCEP(e.target.value)}
+            placeholder="00000-000"
+            maxLength={9}
+            required
+          />
+        </div>
+      )}
+
+      <div className={styles.consentGroup} style={{ marginTop: !formData.naoTemCep ? '-15px' : '0', marginBottom: '25px' }}>
+        <label className={styles.consentLabel}>
+          <input
+            type="checkbox"
+            name="naoTemCep"
+            checked={!!formData.naoTemCep}
+            onChange={handleCheckboxChange}
+            className={styles.checkbox}
+          />
+          <span>Não sei ou não tenho CEP (Ex: zona rural)</span>
+        </label>
       </div>
+
+      {formData.naoTemCep && (
+        <>
+          <div className={styles.inputGroup}>
+            <label>Rua</label>
+            <input
+              type="text"
+              name="rua"
+              value={formData.rua || ''}
+              onChange={handleInputChange}
+              placeholder="Digite sua rua ou localidade"
+              required
+            />
+          </div>
+          <div className={styles.inputGroup}>
+            <label>Bairro</label>
+            <input
+              type="text"
+              name="bairro"
+              value={formData.bairro || ''}
+              onChange={handleInputChange}
+              placeholder="Digite seu bairro ou comunidade"
+              required
+            />
+          </div>
+          <div className={styles.inputGroup}>
+            <label>Cidade</label>
+            <input
+              type="text"
+              name="cidade"
+              value={formData.cidade || ''}
+              onChange={handleInputChange}
+              placeholder="Digite sua cidade"
+              required
+            />
+          </div>
+          <div className={styles.inputGroup}>
+            <label>Estado</label>
+            <input
+              type="text"
+              name="estado"
+              value={formData.estado || ''}
+              onChange={handleInputChange}
+              placeholder="UF"
+              required
+              maxLength={2}
+            />
+          </div>
+        </>
+      )}
+
+      <hr className={styles.sectionDivider} />
+
       <div className={styles.inputGroup}>
         <label>4. Qual seu nível de estudo?</label>
         <div className={styles.radioGroup}>
@@ -389,7 +461,7 @@ export default function Formulario() {
           Das situações de risco abaixo, qual mais te preocupa no dia a dia? (Escolha até 3)
         </label>
         <p className={styles.questionSubtitle}>
-          Esta pergunta nos ajuda a entender as maiores emergências que cuidadores enfrentam. 
+          Esta pergunta nos ajuda a entender as maiores emergências que cuidadores enfrentam.
         </p>
         <div className={styles.radioGroup}>
           {riscoGraveOptions.map((o) => (
@@ -820,11 +892,12 @@ export default function Formulario() {
             onClick={nextStep}
             className={styles.nextButton}
             disabled={
+              isLoading ||
               (step === 0 && !formData.usaTraqueostomia) ||
               (step === 0 && !formData.aceitouTermosPesquisa)
             }
           >
-            Próximo
+            {isLoading && step === 0 ? 'Validando CEP...' : 'Próximo'}
           </button>
         ) : (
           <button

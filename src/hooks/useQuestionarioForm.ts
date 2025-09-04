@@ -1,8 +1,8 @@
 import { useState, useMemo, useCallback } from 'react';
-import { db } from '@/lib/firebase';
+import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import type { FormData } from '@/types';
-import { funcionalidadesOptions } from '@/app/questionario/iniciar/constants';
+import type { FormData } from '../types';
+import { funcionalidadesOptions } from '../app/questionario/iniciar/constants';
 
 /**
  * Hook customizado para gerenciar a lógica do formulário de questionário.
@@ -16,6 +16,7 @@ export const useQuestionarioForm = () => {
     aceitouContatoFuturo: false,
     momentoUsoApp: [],
     riscoGrave: [],
+    naoTemCep: false,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +25,6 @@ export const useQuestionarioForm = () => {
   const clearError = useCallback(() => {
     setError(null);
   }, []);
-
 
   const stepsConfig = useMemo(() => {
     if (formData.usaTraqueostomia === 'Não') {
@@ -35,14 +35,13 @@ export const useQuestionarioForm = () => {
         { name: 'Finalização' },
       ];
     }
-    // Fluxo para "Sim" com a seção de sugestões renomeada
     return [
       { name: 'Seção 1' },
       { name: 'Seção 2' },
       { name: 'Seção 3' },
       { name: 'Seção 4' },
       { name: 'Seção 5' },
-      { name: 'Seção 6' }, 
+      { name: 'Seção 6' },
       { name: 'Finalização' },
     ];
   }, [formData.usaTraqueostomia]);
@@ -60,8 +59,22 @@ export const useQuestionarioForm = () => {
 
   const handleCheckboxChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
-    setFormData(prev => ({ ...prev, [name]: checked }));
-  }, []);
+    
+    if (name === 'naoTemCep') {
+        setFormData(prev => ({
+            ...prev,
+            [name]: checked,
+            cep: '',
+            rua: '',
+            bairro: '',
+            cidade: '',
+            estado: '',
+        }));
+        clearError();
+    } else {
+        setFormData(prev => ({ ...prev, [name]: checked }));
+    }
+  }, [clearError]);
 
   const handleMultiCheckboxChange = useCallback((name: keyof FormData, value: string) => {
     setFormData(prev => {
@@ -95,16 +108,18 @@ export const useQuestionarioForm = () => {
       });
   }, [clearError]);
 
-
-  const fetchAddressFromCEP = useCallback(async (cep: string) => {
-    if (cep.length !== 9) return; // Formato XXXXX-XXX
+  const fetchAddressFromCEP = useCallback(async (cep: string): Promise<boolean> => {
+    if (cep.length !== 9) return true;
+    
+    setIsLoading(true);
     try {
       const response = await fetch(`https://viacep.com.br/ws/${cep.replace('-', '')}/json/`);
       if (!response.ok) throw new Error('CEP não encontrado');
       const data = await response.json();
       if (data.erro) {
-        setError("CEP não encontrado. Verifique o número digitado.");
-        return;
+        setError("CEP não encontrado. Verifique o número ou marque a opção 'Não tenho CEP' para preencher manualmente.");
+        setIsLoading(false);
+        return false;
       }
       setFormData(prev => ({
         ...prev,
@@ -114,19 +129,25 @@ export const useQuestionarioForm = () => {
         estado: data.uf,
       }));
       clearError();
+      setIsLoading(false);
+      return true;
     } catch (err) {
       console.error("Erro ao buscar CEP:", err);
-      setError("Não foi possível buscar o endereço. Verifique sua conexão.");
+      setError("Não foi possível buscar o endereço. Verifique sua conexão ou o CEP digitado.");
+      setIsLoading(false);
+      return false;
     }
   }, [clearError]);
 
   const handleCepChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
-    value = value.replace(/\D/g, ''); 
-    value = value.replace(/^(\d{5})(\d)/, '$1-$2'); 
+    value = value.replace(/\D/g, '');
+    value = value.replace(/^(\d{5})(\d)/, '$1-$2');
     setFormData(prev => ({ ...prev, cep: value.slice(0, 9) }));
-  }, []);
-
+    if(value.length < 9) {
+        clearError();
+    }
+  }, [clearError]);
 
   const validateStep = useCallback((currentStep: number): boolean => {
     const missingFieldMessage = "Por favor, responda a todas as perguntas para continuar.";
@@ -137,9 +158,9 @@ export const useQuestionarioForm = () => {
         }
         return !value;
     };
-    
+
     const fieldsByStepSim: (keyof FormData)[][] = [
-        ['nome', 'contato', 'cep', 'rua', 'nivelEstudo', 'usaTraqueostomia', 'aceitouTermosPesquisa'],
+        [],
         ['parentesco', 'maiorMedo', 'riscoGrave', 'sentimentoApoio', 'confiancaCuidado', 'buscaInformacao', 'filhoIntubado'],
         ['apoioComunidade'],
         [...funcionalidadesOptions.map(f => `func_${f.id}` as keyof FormData), 'momentoUsoApp', 'importanciaApp', 'maiorBeneficio'],
@@ -147,51 +168,73 @@ export const useQuestionarioForm = () => {
     ];
     
     const fieldsByStepNao: (keyof FormData)[][] = [
-        ['nome', 'contato', 'cep', 'rua', 'nivelEstudo', 'usaTraqueostomia', 'aceitouTermosPesquisa'],
+        [],
         ['cuidaOutraCondicao', 'utilidadeOutrasCondicoes'],
         ['filhoIntubado']
     ];
 
-    if(currentStep === 0 && !formData.aceitouTermosPesquisa) {
-        setError("Você precisa aceitar os termos da pesquisa para continuar.");
-        return false;
-    }
+    if(currentStep === 0) {
+        const baseFields: (keyof FormData)[] = ['nome', 'contato', 'nivelEstudo', 'usaTraqueostomia', 'aceitouTermosPesquisa'];
+        let locationFields: (keyof FormData)[] = [];
 
-    let fieldsToValidate: (keyof FormData)[] = [];
-    if(formData.usaTraqueostomia === 'Sim') {
-        fieldsToValidate = fieldsByStepSim[currentStep] || [];
-        if (currentStep === 1 && formData.filhoIntubado && !formData.filhoIntubado.startsWith('Não')) {
-            fieldsToValidate.push('sabiaRiscosIntubacao', 'explicaramRiscosTQT', 'medoIntubacao');
+        if (formData.naoTemCep) {
+            locationFields = ['rua', 'bairro', 'cidade', 'estado'];
+        } else {
+            locationFields = ['cep', 'rua', 'bairro', 'cidade', 'estado'];
         }
-        if (currentStep === 4 && formData.pensouComprarDispositivo && formData.pensouComprarDispositivo !== 'Não, nunca precisei' && formData.pensouComprarDispositivo !== 'Não sabia que era possível comprar por conta própria') {
-            fieldsToValidate.push('dificuldadeCompra');
+
+        const fieldsToValidate = [...baseFields, ...locationFields];
+        for (const field of fieldsToValidate) {
+            if (isFieldMissing(field)) {
+                 if (field === 'rua' && !formData.naoTemCep && formData.cep && formData.cep.length === 9) {
+                    setError("CEP não encontrado. Verifique o número ou marque a opção para preencher manualmente.");
+                    return false;
+                }
+                setError(missingFieldMessage);
+                return false;
+            }
         }
-    } else if (formData.usaTraqueostomia === 'Não') {
-        fieldsToValidate = fieldsByStepNao[currentStep] || [];
-         if (currentStep === 2 && formData.filhoIntubado && !formData.filhoIntubado.startsWith('Não')) {
-            fieldsToValidate.push('sabiaRiscosIntubacao', 'explicaramRiscosTQT', 'medoIntubacao');
+    } else {
+        let fieldsToValidate: (keyof FormData)[] = [];
+        if(formData.usaTraqueostomia === 'Sim') {
+            fieldsToValidate = fieldsByStepSim[currentStep] || [];
+            if (currentStep === 1 && formData.filhoIntubado && !formData.filhoIntubado.startsWith('Não')) {
+                fieldsToValidate.push('sabiaRiscosIntubacao', 'explicaramRiscosTQT', 'medoIntubacao');
+            }
+            if (currentStep === 4 && formData.pensouComprarDispositivo && formData.pensouComprarDispositivo !== 'Não, nunca precisei' && formData.pensouComprarDispositivo !== 'Não sabia que era possível comprar por conta própria') {
+                fieldsToValidate.push('dificuldadeCompra');
+            }
+        } else if (formData.usaTraqueostomia === 'Não') {
+            fieldsToValidate = fieldsByStepNao[currentStep] || [];
+             if (currentStep === 2 && formData.filhoIntubado && !formData.filhoIntubado.startsWith('Não')) {
+                fieldsToValidate.push('sabiaRiscosIntubacao', 'explicaramRiscosTQT', 'medoIntubacao');
+            }
         }
-    } else if (currentStep === 0) {
-        fieldsToValidate = fieldsByStepSim[0];
-    }
-    
-    for (const field of fieldsToValidate) {
-        if (isFieldMissing(field)) {
-            setError(missingFieldMessage);
-            return false;
+        
+        for (const field of fieldsToValidate) {
+            if (isFieldMissing(field)) {
+                setError(missingFieldMessage);
+                return false;
+            }
         }
     }
 
     return true;
   }, [formData]);
 
+  const nextStep = useCallback(async () => {
+    clearError();
+    if (step === 0 && !formData.naoTemCep) {
+        const cep = formData.cep || '';
+        if (cep.length === 9) {
+            await fetchAddressFromCEP(cep);
+        }
+    }
 
-  const nextStep = useCallback(() => {
     if (validateStep(step)) {
-      setError(null);
       setStep(prev => Math.min(prev + 1, totalSteps - 1));
     }
-  }, [step, totalSteps, validateStep]);
+  }, [step, totalSteps, validateStep, formData.cep, formData.naoTemCep, fetchAddressFromCEP, clearError]);
 
   const prevStep = useCallback(() => {
     setError(null);
@@ -200,35 +243,32 @@ export const useQuestionarioForm = () => {
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    clearError();
+
+    if (!formData.naoTemCep) {
+        const isValidCep = await fetchAddressFromCEP(formData.cep || '');
+        if (!isValidCep) {
+            return;
+        }
+    }
+
+    if (!validateStep(step)) {
+        return;
+    }
+
     setIsLoading(true);
 
     try {
-      await fetchAddressFromCEP(formData.cep || '');
-      await new Promise(resolve => setTimeout(resolve, 500)); 
-
-      setFormData(currentData => {
-        const dataToSave = { ...currentData, createdAt: serverTimestamp() };
-        addDoc(collection(db, "respostasQuestionario"), dataToSave)
-          .then(() => {
-            setIsSubmitted(true);
-          })
-          .catch(err => {
-            console.error("Erro ao salvar no Firebase:", err);
-            setError("Ocorreu um erro ao enviar suas respostas. Tente novamente.");
-          })
-          .finally(() => {
-            setIsLoading(false);
-          });
-        return currentData; 
-      });
-
+      const dataToSave = { ...formData, createdAt: serverTimestamp() };
+      await addDoc(collection(db, "respostasQuestionario"), dataToSave);
+      setIsSubmitted(true);
     } catch (err) {
-      console.error("Erro no processo de submissão:", err);
-      setError("Ocorreu um erro ao processar o CEP. Tente novamente.");
+      console.error("Erro ao salvar no Firebase:", err);
+      setError("Ocorreu um erro ao enviar suas respostas. Tente novamente.");
+    } finally {
       setIsLoading(false);
     }
-  }, [formData.cep, fetchAddressFromCEP]);
+  }, [formData, fetchAddressFromCEP, validateStep, step, clearError]);
 
   return {
     step,
