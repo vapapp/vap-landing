@@ -171,6 +171,23 @@
 
 .inputGroup {
   margin-bottom: 25px;
+  transition: all 0.3s ease-in-out;
+}
+
+.errorField {
+  border: 1.5px solid #ef4444; /* red-500 */
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-left: -1.25rem;
+  margin-right: -1.25rem;
+  background-color: #fef2f2; /* red-50 */
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
 }
 
 .inputGroup > label {
