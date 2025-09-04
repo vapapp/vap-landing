@@ -32,9 +32,10 @@ export default function DashboardPage() {
             <StatCard
               title="Total de Respostas"
               value={processedData.totalRespostas}
+              subValue={`Sim: ${processedData.tqtSimCount} | Não: ${processedData.tqtNaoCount}`}
               icon={<Users size={24} />}
               color="blue"
-              tooltipText="Número total de questionários enviados."
+              tooltipText="Número total de questionários enviados, com a divisão entre cuidadores de crianças com e sem traqueostomia."
             />
             <StatCard
               title="Taxa de Confiança"

@@ -46,6 +46,9 @@ const calculateCounts = (
 export function processSubmissionsData(submissions: Submission[]) {
   if (submissions.length === 0) return null;
 
+  const tqtSimCount = submissions.filter(s => s.usaTraqueostomia === 'Sim').length;
+  const tqtNaoCount = submissions.filter(s => s.usaTraqueostomia === 'Não').length;
+
   const tqtSubmissions = submissions.filter(
     (s) => s.usaTraqueostomia === "Sim"
   );
@@ -238,6 +241,8 @@ export function processSubmissionsData(submissions: Submission[]) {
 
   return {
     totalRespostas,
+    tqtSimCount,
+    tqtNaoCount,
     taxaConfianca: Math.round(taxaConfianca),
     necessidadeAlta: Math.round(necessidadeAlta),
     satisfacaoApp: Math.round(satisfacaoApp),
