@@ -13,6 +13,7 @@ export interface FormData {
   bairro?: string;
   cidade?: string;
   estado?: string;
+  naoTemCep?: boolean; 
   nivelEstudo?: string;
   usaTraqueostomia?: 'Sim' | 'Não' | '';
   aceitouTermosPesquisa?: boolean;
