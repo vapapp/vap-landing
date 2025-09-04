@@ -7,6 +7,7 @@ interface StatCardProps {
   icon: React.ReactNode;
   color: "blue" | "green" | "red" | "purple";
   tooltipText?: string;
+  subValue?: string;
 }
 
 const StatCard = ({
@@ -15,6 +16,7 @@ const StatCard = ({
   icon,
   color,
   tooltipText,
+  subValue,
 }: StatCardProps) => {
   return (
     <div className={styles.card}>
@@ -23,7 +25,10 @@ const StatCard = ({
           <p className={styles.title}>{title}</p>
           {tooltipText && <Tooltip text={tooltipText} />}
         </div>
-        <p className={styles.value}>{value}</p>
+        <div className={styles.valueContainer}>
+          <p className={styles.value}>{value}</p>
+          {subValue && <p className={styles.subValue}>{subValue}</p>}
+        </div>
       </div>
       <div className={`${styles.iconWrapper} ${styles[color]}`}>{icon}</div>
     </div>
