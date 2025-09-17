@@ -8,14 +8,14 @@ import { Button } from "@/components/ui/Button";
 import styles from "./VAPChat.module.css";
 import { cn } from "@/lib/utils";
 
-// --- Tipos ---
+
 interface Message {
   id: number;
   content: string;
   role: "user" | "assistant";
 }
 
-// --- Perguntas Sugeridas Atualizadas ---
+
 const suggestedQuestions = [
     "O que é o VAP-App?",
     "Para quem é o VAP-App?",
@@ -54,7 +54,7 @@ const LoadingBubble = () => (
     </div>
 );
 
-// --- Componente de Sugestões Atualizado com Título ---
+
 const SuggestedQuestions = ({ questions, onClick }: { questions: string[], onClick: (question: string) => void }) => (
     <div className={styles.suggestionsContainer}>
         <div className={styles.suggestionsHeader}>
@@ -150,19 +150,16 @@ function ChatLogic() {
         <ChatHeader />
         <div className={styles.chatBody}>
             {messages.map((msg) => <ChatBubble key={msg.id} message={msg} />)}
-            
-           
-            {showSuggestions && (
-                <SuggestedQuestions 
-                    questions={suggestedQuestions} 
-                    onClick={handleSuggestionClick} 
-                />
-            )}
-
             {isLoading && <LoadingBubble />}
             <div ref={messagesEndRef} />
         </div>
         <div className={styles.chatFooter}>
+          {showSuggestions && (
+              <SuggestedQuestions 
+                  questions={suggestedQuestions} 
+                  onClick={handleSuggestionClick} 
+              />
+          )}
           <form onSubmit={handleSubmit}>
             <input
               value={input}
@@ -177,7 +174,11 @@ function ChatLogic() {
           </form>
         </div>
       </div>
-      <Button onClick={() => setIsOpen(!isOpen)} className={styles.toggleButton} aria-label="Abrir ou fechar chat">
+      <Button 
+        onClick={() => setIsOpen(!isOpen)} 
+        className={cn(styles.toggleButton, isOpen && styles.hideOnMobileWhenOpen)} 
+        aria-label="Abrir ou fechar chat"
+      >
         {isOpen ? <X className="h-7 w-7" /> : <Bot className="h-7 w-7" />}
       </Button>
     </div>
