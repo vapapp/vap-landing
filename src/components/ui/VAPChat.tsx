@@ -15,14 +15,12 @@ interface Message {
   role: "user" | "assistant";
 }
 
-
+// --- Perguntas Sugeridas Atualizadas ---
 const suggestedQuestions = [
-    "Quais são as funcionalidades?",
-    "O que é o Guia de Emergência?",
-    "Como funciona o Marketplace?",
+    "O que é o VAP-App?",
+    "Para quem é o VAP-App?",
+    "Como o VAP-App pode me ajudar?",
 ];
-
-
 
 const ChatHeader = () => (
     <div className={styles.chatHeader}>
@@ -56,12 +54,12 @@ const LoadingBubble = () => (
     </div>
 );
 
-
+// --- Componente de Sugestões Atualizado com Título ---
 const SuggestedQuestions = ({ questions, onClick }: { questions: string[], onClick: (question: string) => void }) => (
     <div className={styles.suggestionsContainer}>
         <div className={styles.suggestionsHeader}>
-            <Sparkles className="size-4 text-yellow-500" />
-            <span>Sugestões</span>
+            <Sparkles className="size-4 text-slate-500" />
+            <span>Sugestões para começar</span>
         </div>
         {questions.map((question) => (
             <button key={question} className={styles.suggestionButton} onClick={() => onClick(question)}>
@@ -70,9 +68,6 @@ const SuggestedQuestions = ({ questions, onClick }: { questions: string[], onCli
         ))}
     </div>
 );
-
-
-
 
 function ChatLogic() {
   const searchParams = useSearchParams();
@@ -188,7 +183,6 @@ function ChatLogic() {
     </div>
   );
 }
-
 
 export function VAPChat() {
     return (
