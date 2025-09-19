@@ -42,13 +42,11 @@ export async function POST(req: NextRequest) {
       openAIApiKey: process.env.OPENAI_API_KEY,
     });
 
-   
     const historyAwarePrompt = ChatPromptTemplate.fromMessages([
       new MessagesPlaceholder("chat_history"),
       ["user", "{input}"],
       ["user", "Com base na conversa acima, gere uma pergunta de busca que possa ser entendida sem o histórico."],
     ]);
-
 
     const historyAwareRetrieverChain = await createHistoryAwareRetriever({
       llm,
@@ -56,20 +54,25 @@ export async function POST(req: NextRequest) {
       rephrasePrompt: historyAwarePrompt,
     });
 
-   
     const answerPrompt = ChatPromptTemplate.fromMessages([
       ["system", 
-      `Você é o assistente virtual do VAP-App, um especialista empático e prestativo.
-      Sua missão é ajudar cuidadores de crianças com traqueostomia.
+      `Você é o assistente virtual do VAP-App, um especialista empático, caloroso e prestativo.
+      Sua missão é ajudar cuidadores de crianças com traqueostomia, falando com eles de forma clara e natural.
+      
+      **Instruções para a Voz:**
+      - Use uma linguagem coloquial e amigável, como se estivesse em uma conversa real. Evite ser robótico.
+      - Use pausas naturais (vírgulas) e entonação variada (pontos de exclamação, interrogação) para que sua voz soe mais humana.
+      - Respostas curtas e diretas são melhores para áudio. Se precisar dar uma informação longa, quebre em parágrafos menores.
+
       FORMATE SUAS RESPOSTAS USANDO MARKDOWN.
       Use o seguinte contexto e o histórico da conversa para responder.
       
       CONTEXTO:
       {context}
       
-      REGRAS:
-      1. Se a resposta estiver no contexto, responda de forma completa e bem formatada.
-      2. Se a pergunta não puder ser respondida, diga: "Essa informação eu não tenho no momento, mas posso te contar sobre as funcionalidades do VAP-App, se quiser."
+      REGRAS GERAIS:
+      1. Se a resposta estiver no contexto, responda de forma completa e bem formatada, seguindo as instruções de voz.
+      2. Se a pergunta não puder ser respondida, diga de forma amigável: "Hum, essa informação específica eu não tenho aqui. Mas posso te contar sobre as funcionalidades do VAP-App, se você quiser!"
       3. Nunca invente informações.`
       ],
       new MessagesPlaceholder("chat_history"),
@@ -78,18 +81,15 @@ export async function POST(req: NextRequest) {
 
     const combineDocsChain = await createStuffDocumentsChain({ llm, prompt: answerPrompt });
     
-   
     const conversationalRetrievalChain = await createRetrievalChain({
       retriever: historyAwareRetrieverChain,
       combineDocsChain,
     });
-
    
     const history = messages.slice(0, -1).map((msg: { role: string, content: string }) => 
         msg.role === 'user' ? new HumanMessage(msg.content) : new AIMessage(msg.content)
     );
     const currentMessageContent = messages[messages.length - 1].content;
-
 
     const response = await conversationalRetrievalChain.invoke({
       chat_history: history,
