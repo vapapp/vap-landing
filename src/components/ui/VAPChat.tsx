@@ -8,19 +8,21 @@ import { Button } from "@/components/ui/Button";
 import styles from "./VAPChat.module.css";
 import { cn } from "@/lib/utils";
 
-
+// --- Tipos ---
 interface Message {
   id: number;
   content: string;
   role: "user" | "assistant";
 }
 
-
-const suggestedQuestions = [
+// --- Perguntas Sugeridas ---
+const SUGGESTED_QUESTIONS_DATA = [
     "O que é o VAP-App?",
     "Para quem é o VAP-App?",
     "Como o VAP-App pode me ajudar?",
 ];
+
+// --- Componentes Auxiliares ---
 
 const ChatHeader = () => (
     <div className={styles.chatHeader}>
@@ -34,13 +36,7 @@ const ChatBubble = ({ message }: { message: Message }) => {
     return (
         <div className={cn(styles.bubbleContainer, isUser ? styles.userBubbleContainer : styles.aiBubbleContainer)}>
             <div className={cn(styles.bubble, isUser ? styles.userBubble : styles.aiBubble)}>
-                {isUser ? (
-                    message.content
-                ) : (
-                    <div className={styles.markdown}>
-                        <ReactMarkdown>{message.content}</ReactMarkdown>
-                    </div>
-                )}
+                {isUser ? ( message.content ) : ( <div className={styles.markdown}><ReactMarkdown>{message.content}</ReactMarkdown></div> )}
             </div>
         </div>
     );
@@ -53,7 +49,6 @@ const LoadingBubble = () => (
         </div>
     </div>
 );
-
 
 const SuggestedQuestions = ({ questions, onClick }: { questions: string[], onClick: (question: string) => void }) => (
     <div className={styles.suggestionsContainer}>
@@ -69,50 +64,46 @@ const SuggestedQuestions = ({ questions, onClick }: { questions: string[], onCli
     </div>
 );
 
+// --- Lógica Principal do Chat ---
 function ChatLogic() {
   const searchParams = useSearchParams();
   const chatOpenQuery = searchParams.get('chat') === 'open';
   const [isOpen, setIsOpen] = useState(chatOpenQuery);
   const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      content: "Olá! Eu sou o assistente virtual do VAP-App. Como posso te ajudar hoje?",
-      role: "assistant",
-    },
+    { id: 1, content: "Olá! Eu sou o assistente virtual do VAP-App. Como posso te ajudar hoje?", role: "assistant" }
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(true); 
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+  useEffect(scrollToBottom, [messages, isLoading]);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isLoading]);
-
-  
   const sendMessage = async (content: string) => {
     if (!content.trim() || isLoading) return;
     
-    setShowSuggestions(false); 
+    setShowSuggestions(false);
+    setIsLoading(true);
 
     const userMessage: Message = { id: Date.now(), content, role: "user" };
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
+    const newMessagesForApi = [...messages, userMessage];
+    setMessages(newMessagesForApi);
     setInput("");
-    setIsLoading(true);
 
     try {
       const response = await fetch('/api/chatbot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMessages }), 
+        body: JSON.stringify({ messages: newMessagesForApi }), 
       });
 
-      if (!response.ok) throw new Error('A resposta da rede não foi bem-sucedida.');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'A resposta da rede não foi bem-sucedida.');
+      }
 
       const data = await response.json();
       const aiMessage: Message = {
@@ -120,15 +111,16 @@ function ChatLogic() {
         content: data.reply || "Desculpe, não consegui processar a resposta.",
         role: "assistant",
       };
-      setMessages((prev) => [...prev, aiMessage]);
+      setMessages(prev => [...prev, aiMessage]);
 
     } catch (error) {
+      const errorMessageContent = error instanceof Error ? error.message : "Desculpe, estou com problemas. Tente novamente mais tarde.";
       const errorMessage: Message = {
         id: Date.now() + 1,
-        content: "Desculpe, estou com problemas para me conectar. Tente novamente mais tarde.",
+        content: errorMessageContent,
         role: "assistant",
       };
-      setMessages((prev) => [...prev, errorMessage]);
+      setMessages(prev => [...prev, errorMessage]);
       console.error("Falha ao buscar resposta do chatbot:", error);
     } finally {
       setIsLoading(false);
@@ -156,7 +148,7 @@ function ChatLogic() {
         <div className={styles.chatFooter}>
           {showSuggestions && (
               <SuggestedQuestions 
-                  questions={suggestedQuestions} 
+                  questions={SUGGESTED_QUESTIONS_DATA} 
                   onClick={handleSuggestionClick} 
               />
           )}
@@ -168,7 +160,7 @@ function ChatLogic() {
               className={styles.input}
               disabled={isLoading}
             />
-            <Button type="submit" size="sm" className={styles.sendButton} disabled={isLoading}>
+            <Button type="submit" size="sm" className={styles.sendButton} disabled={isLoading || !input.trim()}>
               <Send className="size-4" />
             </Button>
           </form>
