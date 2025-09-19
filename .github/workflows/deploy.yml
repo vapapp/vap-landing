@@ -22,9 +22,9 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    # NOVO PASSO: Cria o arquivo .env.production com os secrets
     - name: Create .env.production file
       run: |
+        echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env.production
         echo "NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}" >> .env.production
         echo "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}" >> .env.production
         echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}" >> .env.production
@@ -39,8 +39,7 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/vap-landing:latest
-        # REMOVIDO: A seção 'build-args' foi removida daqui
-
+        
     - name: Deploy to VPS
       uses: appleboy/ssh-action@master
       with:
@@ -55,4 +54,5 @@ jobs:
           docker run -d --restart always \
             -p 3001:3001 \
             --name vap-landing-container \
+            -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/vap-landing:latest
