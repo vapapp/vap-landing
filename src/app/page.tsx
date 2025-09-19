@@ -1,5 +1,6 @@
 import { Hero } from "../components/ui/Hero";
 import LightRays from "../components/ui/LightRays"; 
+import { VAPChat } from "@/components/ui/VAPChat"; 
 import styles from './Home.module.css';
 
 export default function HomePage() {
@@ -23,6 +24,8 @@ export default function HomePage() {
       <div className={styles.content}>
         <Hero />
       </div>
+
+      <VAPChat />
     </main>
   );
 }
