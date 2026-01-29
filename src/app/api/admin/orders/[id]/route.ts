@@ -104,13 +104,12 @@ export async function PATCH(
       'tracking_code',
       'estimated_delivery_date',
       'internal_notes',
-    ];
+    ] as const;
     const updates: Partial<OrderUpdatePayload> = {};
 
     for (const field of allowedFields) {
-      if (field in body) {
-        updates[field as keyof OrderUpdatePayload] =
-          body[field as keyof OrderUpdatePayload];
+      if (field in body && body[field as keyof OrderUpdatePayload] !== undefined) {
+        (updates as any)[field] = body[field as keyof OrderUpdatePayload];
       }
     }
 
