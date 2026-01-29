@@ -4,7 +4,6 @@ import { rateLimit, getIdentifier, apiRateLimit, RateLimitError } from '@/lib/ra
 import type {
   OrderFilters,
   OrdersListResponse,
-  OrderStats,
   MarketplaceOrderWithItems,
 } from '@/types/orders';
 
@@ -129,41 +128,3 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// GET /api/admin/orders/stats - Obter estatísticas gerais dos pedidos
-export async function getOrderStats(): Promise<OrderStats> {
-  try {
-    const { data: orders, error } = await supabaseAdmin
-      .from('marketplace_orders')
-      .select('total, status');
-
-    if (error) {
-      throw new Error('Failed to fetch order stats');
-    }
-
-    const stats: OrderStats = {
-      total_orders: orders?.length || 0,
-      total_revenue: orders?.reduce((sum, order) => sum + order.total, 0) || 0,
-      pending_orders:
-        orders?.filter(
-          (order) =>
-            order.status === 'pending' ||
-            order.status === 'payment_pending' ||
-            order.status === 'processing'
-        ).length || 0,
-      average_order_value:
-        orders && orders.length > 0
-          ? orders.reduce((sum, order) => sum + order.total, 0) / orders.length
-          : 0,
-    };
-
-    return stats;
-  } catch (error) {
-    console.error('Error fetching order stats:', error);
-    return {
-      total_orders: 0,
-      total_revenue: 0,
-      pending_orders: 0,
-      average_order_value: 0,
-    };
-  }
-}
