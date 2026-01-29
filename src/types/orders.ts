@@ -10,7 +10,7 @@ export type OrderStatus =
   | 'cancelled'
   | 'refunded';
 
-export type PaymentMethod = 'card' | 'boleto' | 'pix';
+export type PaymentMethod = 'card' | 'boleto' | 'pix' | 'stripe';
 
 export type PaymentStatus = 'pending' | 'approved' | 'rejected' | 'refunded';
 
@@ -135,4 +135,5 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   card: 'Cartão de Crédito',
   boleto: 'Boleto',
   pix: 'PIX',
+  stripe: 'Stripe',
 };
