@@ -54,8 +54,18 @@ jobs:
         script: |
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/vap-landing:latest
-          docker stop vap-landing-container || true
-          docker rm vap-landing-container || true
+
+          # Parar e remover container antigo
+          docker stop vap-landing-container 2>/dev/null || true
+          docker rm vap-landing-container 2>/dev/null || true
+
+          # Parar qualquer container usando a porta 3001
+          CONTAINER_USING_PORT=$(docker ps -q --filter "publish=3001")
+          if [ ! -z "$CONTAINER_USING_PORT" ]; then
+            docker stop $CONTAINER_USING_PORT
+            docker rm $CONTAINER_USING_PORT
+          fi
+
           docker run -d --restart always \
             -p 3001:3001 \
             --name vap-landing-container \
