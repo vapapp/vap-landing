@@ -5,12 +5,14 @@ import { usePathname } from "next/navigation";
 import styles from "./Sidebar.module.css";
 
 const navItems = [
-  { href: "/admin/dashboard", label: "Visão Geral" },
-  { href: "/admin/dashboard/demografia", label: "Demografia" },
-  { href: "/admin/dashboard/funcionalidades", label: "Funcionalidades" },
-  { href: "/admin/dashboard/comportamento", label: "Comportamento" },
-  { href: "/admin/dashboard/acesso", label: "Acesso e Advocacia" },
-  { href: "/admin/dashboard/ouvidoria", label: "Ouvidoria" },
+  { href: "/admin/pedidos", label: "Pedidos" },
+  // Outras páginas temporariamente ocultas
+  // { href: "/admin/dashboard", label: "Visão Geral" },
+  // { href: "/admin/dashboard/demografia", label: "Demografia" },
+  // { href: "/admin/dashboard/funcionalidades", label: "Funcionalidades" },
+  // { href: "/admin/dashboard/comportamento", label: "Comportamento" },
+  // { href: "/admin/dashboard/acesso", label: "Acesso e Advocacia" },
+  // { href: "/admin/dashboard/ouvidoria", label: "Ouvidoria" },
 ];
 
 interface SidebarProps {
