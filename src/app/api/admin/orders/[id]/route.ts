@@ -98,19 +98,20 @@ export async function PATCH(
     const { id } = await params;
     const body: OrderUpdatePayload = await request.json();
 
-    // Validar campos permitidos
-    const allowedFields = [
-      'status',
-      'tracking_code',
-      'estimated_delivery_date',
-      'internal_notes',
-    ] as const;
+    // Validar campos permitidos e construir objeto de atualização
     const updates: Partial<OrderUpdatePayload> = {};
 
-    for (const field of allowedFields) {
-      if (field in body && body[field as keyof OrderUpdatePayload] !== undefined) {
-        (updates as any)[field] = body[field as keyof OrderUpdatePayload];
-      }
+    if (body.status !== undefined) {
+      updates.status = body.status;
+    }
+    if (body.tracking_code !== undefined) {
+      updates.tracking_code = body.tracking_code;
+    }
+    if (body.estimated_delivery_date !== undefined) {
+      updates.estimated_delivery_date = body.estimated_delivery_date;
+    }
+    if (body.internal_notes !== undefined) {
+      updates.internal_notes = body.internal_notes;
     }
 
     // Validar status se fornecido
