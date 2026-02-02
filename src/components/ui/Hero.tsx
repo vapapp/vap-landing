@@ -25,9 +25,9 @@ function Hero() {
     <div className={styles.container}>
       <div className={styles.heroContent}>
         
-        <Link href="/termos-de-pesquisa" passHref>
+        <Link href="/politica-de-privacidade" passHref>
           <Button variant="secondary" size="sm">
-            Leia os termos da pesquisa <FileText className={styles.icon} />
+            Política de Privacidade <FileText className={styles.icon} />
           </Button>
         </Link>
 
