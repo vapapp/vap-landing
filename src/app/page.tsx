@@ -1,16 +1,15 @@
 import { Hero } from "../components/ui/Hero";
-import LightRays from "../components/ui/LightRays"; 
-import { VAPChat } from "@/components/ui/VAPChat"; 
+import LightRays from "../components/ui/LightRays";
 import styles from './Home.module.css';
 
 export default function HomePage() {
   return (
     <main className={styles.main}>
-   
+
       <div className={styles.background}>
         <LightRays
           raysOrigin="top-center"
-          raysColor="#00949D" 
+          raysColor="#00949D"
           raysSpeed={0.8}
           lightSpread={0.7}
           rayLength={1.2}
@@ -24,8 +23,6 @@ export default function HomePage() {
       <div className={styles.content}>
         <Hero />
       </div>
-
-      <VAPChat />
     </main>
   );
 }
