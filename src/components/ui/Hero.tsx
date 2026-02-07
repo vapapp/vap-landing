@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { MoveRight, Mail, FileText } from "lucide-react"; 
+import { MoveRight, Mail, FileText, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import styles from "./Hero.module.css";
 import Link from "next/link"; 
@@ -24,12 +24,19 @@ function Hero() {
   return (
     <div className={styles.container}>
       <div className={styles.heroContent}>
-        
-        <Link href="/politica-de-privacidade" passHref>
-          <Button variant="secondary" size="sm">
-            Política de Privacidade <FileText className={styles.icon} />
-          </Button>
-        </Link>
+
+        <div className={styles.topButtons}>
+          <Link href="/suporte" passHref>
+            <Button variant="secondary" size="sm">
+              Suporte <HelpCircle className={styles.icon} />
+            </Button>
+          </Link>
+          <Link href="/politica-de-privacidade" passHref>
+            <Button variant="secondary" size="sm">
+              Privacidade <FileText className={styles.icon} />
+            </Button>
+          </Link>
+        </div>
 
         <div className={styles.textContainer}>
           <h1 className={styles.heading}>
