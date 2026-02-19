@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import styles from "./Termos.module.css";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default function TermosDePesquisaPage() {
+  notFound();
   return (
     <main className={styles.container}>
       <div className={styles.card}>

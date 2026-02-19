@@ -1,0 +1,302 @@
+.section {
+  padding: 6rem 1rem 4rem;
+  background: #ffffff;
+  position: relative;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* CTA Card */
+.ctaCard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 30px;
+  padding: 4rem 3rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 4rem 1rem 3rem;
+  }
+
+  .ctaCard {
+    padding: 3rem 2rem;
+    border-radius: 24px;
+  }
+
+  .title {
+    font-size: clamp(1.75rem, 6vw, 2.25rem);
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding: 3rem 0.75rem 2rem;
+  }
+
+  .ctaCard {
+    padding: 2.5rem 1.25rem;
+    gap: 1.5rem;
+    border-radius: 20px;
+  }
+
+  .badge {
+    font-size: 0.813rem;
+    padding: 0.4rem 1rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .description {
+    font-size: 0.938rem;
+  }
+
+  .footnote {
+    font-size: 0.813rem;
+  }
+}
+
+/* Efeito de gradiente no fundo */
+.ctaCard::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(circle at 30% 50%, rgba(0, 148, 157, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 70% 50%, rgba(0, 201, 215, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  background: rgba(0, 148, 157, 0.2);
+  border: 1px solid rgba(0, 148, 157, 0.4);
+  border-radius: 9999px;
+  color: #00C9D7;
+  font-size: 0.875rem;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  z-index: 1;
+}
+
+.title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.2;
+  color: #0a0a0a;
+  margin: 0;
+  z-index: 1;
+}
+
+.highlight {
+  background: linear-gradient(135deg, #00949D 0%, #00C9D7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.description {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: #6b7280;
+  max-width: 600px;
+  margin: 0;
+  z-index: 1;
+}
+
+/* Botões das Stores */
+.storeButtons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  z-index: 1;
+}
+
+.storeButtonWrapper {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+
+@media (max-width: 640px) {
+  .storeButtons {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}
+
+.storeButton {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem !important;
+  height: auto !important;
+  min-height: 60px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+.storeButton::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #00949D 0%, #00C9D7 100%);
+  transition: top 0.4s ease;
+  z-index: -1;
+}
+
+.storeButton:hover::before {
+  top: 0;
+}
+
+.storeButton:hover {
+  color: white;
+  border-color: #00C9D7;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 148, 157, 0.3);
+}
+
+.storeButton:hover .storeIcon,
+.storeButton:hover .storeText {
+  color: white;
+}
+
+@media (max-width: 640px) {
+  .storeButton {
+    width: 100%;
+    justify-content: center;
+    padding: 0.5rem 0.75rem !important;
+    min-height: 48px;
+    gap: 0.5rem !important;
+  }
+
+  .storeLabel {
+    display: none;
+  }
+
+  .storeName {
+    font-size: 0.875rem;
+  }
+
+  .storeIcon {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.storeIcon {
+  width: 28px;
+  height: 28px;
+  transition: color 0.4s ease;
+  z-index: 1;
+  position: relative;
+}
+
+.storeText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+  transition: color 0.4s ease;
+  z-index: 1;
+  position: relative;
+}
+
+.storeLabel {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  transition: opacity 0.4s ease;
+}
+
+.storeButton:hover .storeLabel {
+  opacity: 1;
+}
+
+.storeName {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.footnote {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  margin: 0;
+  z-index: 1;
+}
+
+/* Footer */
+.footer {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.footerLinks {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.footerLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 0.938rem;
+  transition: all 0.3s ease;
+}
+
+.footerLink:hover {
+  color: #00949D;
+}
+
+.footerIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.copyright {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.copyright p {
+  margin: 0.25rem 0;
+}
+
+.cnpj {
+  font-size: 0.813rem;
+  color: #d1d5db;
+}

@@ -31,11 +31,11 @@
 
 
 .default {
-  background-color: var(--foreground);
-  color: var(--background);
+  background-color: #0a0a0a;
+  color: #ffffff;
 }
 .default:hover {
-  background-color: #333; 
+  background-color: #333;
 }
 
 .secondary {

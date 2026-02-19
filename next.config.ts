@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true, // ESLint runs separately; avoids @eslint/eslintrc compat issues at build time
+  },
+
   // 🛡️ PROTEÇÕES DE SEGURANÇA CONTRA DoS
 
   // Limitar tamanho do body para prevenir ataques de payload massivo

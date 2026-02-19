@@ -1,7 +1,7 @@
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import styles from './Welcome.module.css';
 import type { Metadata } from 'next';
-
 
 export const metadata: Metadata = {
   title: 'Participe da Pesquisa',
@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default function WelcomePage() {
+  notFound();
   return (
     <main className={styles.container}>
       <div className={styles.card}>
