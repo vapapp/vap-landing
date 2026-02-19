@@ -36,7 +36,7 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/docs/knowledge_base.md ./docs/knowledge_base.md
 
 # Remove as dependências de desenvolvimento para deixar a imagem final mais leve
-RUN npm prune --omit=dev
+RUN npm prune --omit=dev --legacy-peer-deps
 
 EXPOSE 3001
 CMD ["npm", "start"]
