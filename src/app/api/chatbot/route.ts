@@ -8,7 +8,7 @@ let knowledgeBase: string | null = null;
 function loadKnowledgeBase(): string {
   if (knowledgeBase) return knowledgeBase;
   try {
-    const filePath = path.join(process.cwd(), 'knowledge_base.md');
+    const filePath = path.join(process.cwd(), 'docs', 'knowledge_base.md');
     knowledgeBase = fs.readFileSync(filePath, 'utf-8');
     return knowledgeBase;
   } catch {
