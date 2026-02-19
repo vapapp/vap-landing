@@ -39,6 +39,9 @@ yarn-error.log*
 # IDE local (Claude Code)
 .claude/
 
+# Arquivos de mídia grandes (servir via CDN ou copiar manualmente)
+public/videos/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
