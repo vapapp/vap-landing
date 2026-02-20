@@ -27,7 +27,7 @@ export function AppVideoDemo() {
 
         {/* Video Player */}
         <div className={styles.videoWrapper}>
-          <VideoPlayer src="https://firebasestorage.googleapis.com/v0/b/vap-app-9367c.firebasestorage.app/o/Meu%20Filme%202.mp4?alt=media&token=a13bd0c7-af1c-4f79-812e-83e34056308b" />
+          <VideoPlayer src="https://firebasestorage.googleapis.com/v0/b/vap-app-9367c.firebasestorage.app/o/Meu%20Filme%202.mp4?alt=media&token=f4099344-cc54-46bf-b2d7-712e415882f6" />
         </div>
       </div>
     </motion.section>
